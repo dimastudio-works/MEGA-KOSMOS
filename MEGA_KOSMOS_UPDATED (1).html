@@ -1,0 +1,2387 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MEGA KOSMOS: ORIGINS</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;overflow:hidden;background:#101d2c;color:white;font-family:Arial,sans-serif}
+#game{position:absolute;inset:0}
+canvas{display:block}
+#top{position:absolute;top:12px;left:12px;right:12px;display:flex;gap:10px;flex-wrap:wrap;pointer-events:none}
+.panel{background:#101d2eea;border:1px solid #42617b;border-radius:12px;padding:12px;box-shadow:0 5px 20px #0005}
+.brand{font-weight:bold;font-size:16px;color:#76e4ff}
+.stats{display:flex;gap:20px;flex-wrap:wrap}
+.stat{font-size:12px;color:#a9c6da}
+.stat b{display:block;color:white;font-size:17px;margin-top:4px}
+#menu{position:absolute;top:110px;left:12px;width:220px;max-height:68vh;overflow:auto}
+h3{font-size:12px;color:#76e4ff;letter-spacing:1px}
+button{background:#203c56;color:white;border:1px solid #537b9b;border-radius:8px;padding:10px;cursor:pointer}
+button:hover{background:#326080}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.tools button{font-size:12px}
+.tools button.active{outline:2px solid #76e4ff;background:#24536c}
+#freeHouseBadge{
+ background:#b9ffc2;
+ color:#08752b;
+ border:1px solid #36bd5b;
+ border-radius:8px;
+ padding:9px;
+ text-align:center;
+ font-weight:bold;
+ margin-bottom:10px;
+}
+#info{position:absolute;right:12px;top:110px;width:190px;font-size:12px}
+.bar{height:7px;background:#294052;border-radius:10px;margin:5px 0 12px;overflow:hidden}
+.bar div{height:100%;background:#53d7b1;width:50%}
+#bottom{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:7px;flex-wrap:wrap;justify-content:center;width:max-content;max-width:95%}
+#bottom button{font-size:12px}
+#message{position:absolute;top:80px;left:50%;transform:translateX(-50%);background:#102e42;padding:10px 18px;border-radius:9px;opacity:0;transition:.2s;pointer-events:none}
+#worldPanel{position:absolute;right:12px;bottom:76px;width:230px;z-index:5;font-size:12px;max-height:45vh;overflow:auto}
+#worldPanel h3{margin:2px 0 8px}
+#worldPanel label{display:block;color:#a9c6da;margin:7px 0 3px}
+#worldPanel input,#worldPanel select{width:100%;padding:8px;border-radius:7px;border:1px solid #537b9b;background:#152d43;color:#fff}
+.worldStats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:9px}
+.worldStat{background:#18344a;border-radius:7px;padding:7px}
+.worldStat b{display:block;color:#fff;font-size:13px;margin-top:3px}
+@media(max-width:650px){
+ #menu{top:auto;bottom:75px;width:170px}
+ #info{top:110px;width:145px}
+ .stats{gap:9px}
+ .brand{font-size:12px}
+}
+</style>
+</head>
+<body>
+<div id="game"></div>
+
+<div id="top">
+ <div class="panel brand">🌌 MEGA KOSMOS: ORIGINS</div>
+ <div class="panel stats">
+  <div class="stat">БЮДЖЕТ<b id="money">₡ 0</b></div>
+  <div class="stat">НАСЕЛЕННЯ<b id="population">120</b></div>
+  <div class="stat">ПРИБУТОК ЗА ДЕНЬ<b id="income">₡ 0</b></div>
+  <div class="stat">ДЕНЬ<b id="day">1</b></div>
+ </div>
+</div>
+
+<div id="menu" class="panel">
+ <h3>🏗️ БУДІВНИЦТВО</h3>
+ <div id="freeHouseBadge">3 free house</div>
+ <div class="tools">
+  <button data-type="house">🏠 Будинок<br>₡325</button>
+  <button data-type="shop">🏪 Магазин<br>₡900</button>
+  <button data-type="school">🏫 Школа<br>₡100</button>
+  <button data-type="park">🌳 Парк<br>₡500</button>
+  <button data-type="factory">🏭 Фабрика<br>₡1200</button>
+  <button data-type="power">⚡ Електрика<br>₡1000</button>
+  <button data-type="road">🛣️ Дорога<br>₡120</button>
+  <button data-type="rail">🛤️ Рейки<br>₡240</button>
+  <button data-type="roadrail">🚘🚆 Спільна дорога + рейки<br>₡320</button>
+  <button data-type="parking">🅿️ Парковка<br>₡450</button>
+<button data-type="traffic">🚦 Світлофор<br>₡300</button>
+  <button data-type="hospital">🏥 Лікарня<br>₡2500</button>
+  <button data-type="cafe">☕ Кафе<br>₡1200</button>
+  <button data-type="supermarket">🛒 Супермаркет<br>₡1800</button>
+  <button data-type="office">🏢 Офіс<br>₡2200</button>
+  <button data-type="cinema">🎬 Кінотеатр<br>₡3000</button>
+  <button data-type="firestation">🚒 Пожежна частина<br>₡1600</button>
+  <button data-type="library">📚 Бібліотека<br>₡1400</button>
+  <button data-type="university">🎓 Університет<br>₡4200</button>
+  <button data-type="stadium">🏟️ Стадіон<br>₡5200</button>
+  <button data-type="hotel">🏨 Готель<br>₡2800</button>
+  <button data-type="bank">🏦 Банк<br>₡3500</button>
+  <button data-type="police">🚓 Поліція<br>₡2100</button>
+  <button data-type="museum">🏛️ Музей<br>₡2600</button>
+  <button data-type="station">🚉 Вокзал<br>₡3800</button>
+  <button data-type="warehouse">📦 Склад<br>₡1700</button>
+  <button data-type="waterplant">💧 Водостанція<br>₡2400</button>
+ </div>
+ <hr>
+ <button id="rotate">↻ Повернути</button>
+ <button id="addFloor">🏢 Додати поверх<br>за 300 кр.</button>
+ <button id="remove">🧹 Знести</button>
+ <p style="font-size:10px;color:#a9c6da;line-height:1.5">
+ Обери будівлю, потім клацни на острові. Коліщатко миші змінює масштаб, права кнопка миші обертає камеру.
+ </p>
+</div>
+
+<div id="info" class="panel">
+ <h3>📊 СТАН МІСТА</h3>
+ Щастя: <b id="happy">75%</b>
+ <div class="bar"><div id="happybar" style="width:75%"></div></div>
+ Екологія: <b id="eco">90%</b>
+ <div class="bar"><div id="ecobar" style="width:90%"></div></div>
+ Освіта: <b id="education">15%</b>
+ <div class="bar"><div id="edubar" style="width:15%"></div></div>
+ <hr>
+ <b>🎯 Мета:</b>
+ <p id="goal">Збудуй 5 житлових будинків!</p>
+</div>
+
+<div id="worldPanel" class="panel">
+ <h3>🌍 СВІТ І ПРИРОДА</h3>
+ <label for="cityName">Назва твого міста</label>
+ <input id="cityName" maxlength="24" value="місто">
+ <label for="countrySelect">Країна</label>
+ <select id="countrySelect">
+  <option value="Україна">🇺🇦 Україна</option>
+  <option value="Польща">🇵🇱 Польща</option>
+  <option value="Німеччина">🇩🇪 Німеччина</option>
+  <option value="Франція">🇫🇷 Франція</option>
+  <option value="Японія">🇯🇵 Японія</option>
+  <option value="Канада">🇨🇦 Канада</option>
+  <option value="США">🇺🇸 США</option>
+ </select>
+ <label for="worldCitySelect">Міста для розвитку</label>
+ <select id="worldCitySelect">
+  <option value="місто">місто — стартове</option>
+ </select>
+ <div class="worldStats">
+  <div class="worldStat">Погода<b id="weatherLabel">Сонячно</b></div>
+  <div class="worldStat">Пора року<b id="seasonLabel">Весна</b></div>
+  <div class="worldStat">Жителі<b id="residentLabel">120</b></div>
+  <div class="worldStat">Міста відкрито<b id="citiesLabel">1</b></div>
+ </div>
+ <p id="worldHint" style="color:#a9c6da;line-height:1.4;margin-bottom:2px">Розвивай місто, щоб відкривати нові міста світу.</p>
+ <div class="worldStat" style="margin-top:8px">
+  Територія<b id="territoryName">Маленький острів</b>
+  <span id="territoryProgress" style="display:block;color:#a9c6da;margin-top:4px">Початковий рівень</span>
+ </div>
+ <button id="expandTerritory" style="width:100%;margin-top:8px;background:#24536c">🔒 Розширити територію</button>
+ <p id="expandRequirements" style="color:#a9c6da;line-height:1.45;margin:6px 0 2px"></p>
+</div>
+
+<div id="garagePanel" class="panel" style="display:none;position:absolute;bottom:76px;left:50%;transform:translateX(-50%);z-index:20;max-width:min(760px,94vw);display:none;flex-wrap:wrap;justify-content:center;background:#142536f2;border:1px solid #52718b;border-radius:12px;padding:10px;gap:7px">
+ <b style="width:100%;text-align:center">🚘 ГАРАЖ — обери транспорт</b>
+ <button data-vehicle="car">🚗 Авто · ₡100 000</button>
+ <button data-vehicle="motorcycle">🏍️ Мотоцикл · ₡65 000</button>
+ <button data-vehicle="lamborghini">🏎️ Ламба · ₡250 000</button>
+ <button data-vehicle="suv">🚙 Позашляховик · ₡160 000</button>
+</div>
+<div id="bottom" class="panel">
+  <button id="garageToggle">🚘 Гараж</button>
+ <button id="pedestrianToggle">🚶 Пішохід</button>
+ <button id="markHome">🏠 Позначити дім</button>
+ <button id="driveCar" disabled>🔑 Сісти за кермо</button>
+ <button id="trainRide">🚆 Сісти в потяг</button>
+ <button id="relocateCar" disabled>📍 Перемістити авто</button>
+ <button id="settings">⚙️ Налаштування</button>
+ <button id="next">⏩ Наступний день</button>
+ <button id="topview">🛰️ Вид зверху</button>
+ <button id="normalview">🌆 Звичайна камера</button>
+  <button id="orbit360">🔄 Огляд 360°</button>
+  <button id="manualRotate">🖱️ Ручне обертання</button>
+ <button id="save">💾 Зберегти</button>
+ <button id="load">📂 Завантажити</button>
+</div>
+<div id="settingsPanel" class="panel" style="
+ display:none;
+ position:absolute;
+ top:50%;
+ left:50%;
+ transform:translate(-50%,-50%);
+ width:300px;
+ z-index:20;
+ text-align:center;
+">
+ <h2 style="color:#76e4ff">⚙️ НАЛАШТУВАННЯ</h2>
+ <button id="soundToggle">🔊 Звук: Увімкнено</button>
+ <hr>
+ <button id="restartGame" style="background:#963c3c">
+  🔄 Почати гру спочатку
+ </button>
+ <br><br>
+ <button id="closeSettings">Закрити</button>
+</div>
+<div id="shopPanel" class="panel" style="display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:30;width:min(360px,92vw);background:#142536f5">
+ <h3>🛒 МАГАЗИН — ПРОДУКТИ</h3>
+ <div id="inventoryLabel" style="color:#b9d7e8;margin:6px 0 10px">Кошик порожній</div>
+ <div class="tools">
+  <button data-product="bread">🍞 Хліб · ₡25</button><button data-product="milk">🥛 Молоко · ₡35</button>
+  <button data-product="apple">🍎 Яблука · ₡20</button><button data-product="cheese">🧀 Сир · ₡55</button>
+  <button data-product="water">💧 Вода · ₡15</button><button data-product="chocolate">🍫 Шоколад · ₡40</button>
+ </div>
+ <button id="closeShop" style="width:100%;margin-top:9px">Закрити магазин</button>
+</div>
+<div id="cinemaHud" style="display:none;position:absolute;left:50%;top:16px;transform:translateX(-50%);background:#171225ed;border:1px solid #d6b85c;border-radius:10px;padding:10px 16px;z-index:12">🎬 Перегляд кіно · E — встати</div>
+<div id="homeHud" style="display:none;position:absolute;left:50%;bottom:170px;transform:translateX(-50%);background:#102e42eF;border:1px solid #76e4ff;border-radius:10px;padding:10px 16px;z-index:8">🏠 Ти вдома · E — вийти</div>
+<div id="pedestrianHud" style="display:none;position:absolute;left:50%;bottom:126px;transform:translateX(-50%);background:#102e42eF;border:1px solid #76e4ff;border-radius:10px;padding:10px 16px;font-weight:bold;text-align:center;z-index:8">🚶 WASD — рух · E — увійти/вийти · F5 — змінити камеру · Esc — вийти</div>
+<div id="trainHud" style="display:none;position:absolute;left:50%;bottom:122px;transform:translateX(-50%);background:#102e42eF;border:1px solid #f0c65b;border-radius:10px;padding:10px 16px;font-weight:bold;text-align:center;z-index:8">🚆 Потяг: W — вперед · S — назад/гальмо · E — вийти</div>
+<div id="driveHud" style="display:none;position:absolute;left:50%;bottom:78px;transform:translateX(-50%);background:#102e42eF;border:1px solid #76e4ff;border-radius:10px;padding:10px 16px;font-weight:bold;text-align:center;z-index:8">🚗 Водіння: W/S — газ і гальмо · A/D — поворот · Esc — вийти</div>
+<div id="message"></div>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+// Окремий профіль для друга: основне збереження користувача лишається недоторканим.
+const IS_FRIEND_GAME = new URLSearchParams(location.search).get('friend') === '1';
+const SAVE_KEY = IS_FRIEND_GAME ? 'megaKosmosFriendSaveV1' : 'megaKosmosSaveV2';
+const DAY_KEY = IS_FRIEND_GAME ? 'nextDayReadyAtFriendV1' : 'nextDayReadyAtV4';
+if(IS_FRIEND_GAME){
+ const brand=document.querySelector('.brand');
+ if(brand)brand.textContent='🌌 MEGA KOSMOS: ORIGINS · ГРА ДЛЯ ДРУГА';
+}
+
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x91c9e8);
+scene.fog=new THREE.Fog(0x91c9e8,320,1400);
+// На великих рівнях світу відсуваємо туман пропорційно території,
+// щоб далеке місто не перетворювалося на суцільну сіру пляму.
+function updateWorldVisibility(){
+ const near=Math.max(320,territoryRadius*2);
+ const far=Math.max(1400,territoryRadius*8);
+ if(scene.fog){scene.fog.near=near;scene.fog.far=far;}
+ camera.far=Math.max(5000,territoryRadius*12);
+ camera.updateProjectionMatrix();
+}
+
+const camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,.1,5000);
+let radius=48,angle=.75,height=1.0;
+camera.position.set(30,35,35);
+
+const renderer=new THREE.WebGLRenderer({antialias:false,powerPreference:"high-performance"});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.25));
+// Вимикаємо дорогі динамічні тіні: це суттєво зменшує навантаження на відеокарту.
+renderer.shadowMap.enabled=false;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.12;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.domElement.tabIndex=0;
+renderer.domElement.setAttribute('aria-label','Ігрове поле MEGA KOSMOS');
+document.getElementById('game').appendChild(renderer.domElement);
+
+// Ручне обертання камери мишкою
+let manualRotate=false,manualPointerId=null,manualLastX=0,manualLastY=0;
+const manualRotateButton=document.getElementById('manualRotate');
+function setManualRotate(active){
+ manualRotate=active;
+ manualRotateButton.classList.toggle('active',active);
+ manualRotateButton.textContent=active?'🖱️ Завершити обертання':'🖱️ Ручне обертання';
+ renderer.domElement.style.cursor=active?'grab':'default';
+ if(active){orbit360=false;const orbitButton=document.getElementById('orbit360');if(orbitButton)orbitButton.textContent='🔄 Огляд 360°';}
+ notify(active?'Затисни ліву кнопку миші й перетягни, щоб обертати місто':'Ручне обертання вимкнено');
+}
+manualRotateButton.onclick=()=>setManualRotate(!manualRotate);
+renderer.domElement.addEventListener('pointerdown',e=>{
+ if(!manualRotate||playerDriving||e.button!==0)return;
+ manualPointerId=e.pointerId;manualLastX=e.clientX;manualLastY=e.clientY;
+ renderer.domElement.setPointerCapture(e.pointerId);
+ renderer.domElement.style.cursor='grabbing';
+ e.preventDefault();e.stopImmediatePropagation();
+},true);
+renderer.domElement.addEventListener('pointermove',e=>{
+ if(!manualRotate||manualPointerId!==e.pointerId)return;
+ const dx=e.clientX-manualLastX,dy=e.clientY-manualLastY;
+ angle-=dx*.008;
+ height=Math.max(.2,Math.min(2.2,height+dy*.006));
+ manualLastX=e.clientX;manualLastY=e.clientY;
+ e.preventDefault();
+},true);
+function stopManualPointer(e){
+ if(manualPointerId===null||(e&&e.pointerId!==manualPointerId))return;
+ try{if(renderer.domElement.hasPointerCapture(manualPointerId))renderer.domElement.releasePointerCapture(manualPointerId);}catch(_e){}
+ manualPointerId=null;
+ renderer.domElement.style.cursor=manualRotate?'grab':'default';
+}
+renderer.domElement.addEventListener('pointerup',stopManualPointer,true);
+renderer.domElement.addEventListener('pointercancel',stopManualPointer,true);
+
+scene.add(new THREE.HemisphereLight(0xd9f4ff,0x53634b,2));
+const sun=new THREE.DirectionalLight(0xfff0d0,2.5);
+sun.position.set(-25,45,20);
+sun.castShadow=true;
+sun.shadow.mapSize.set(4096,4096);
+sun.shadow.camera.left=-180;sun.shadow.camera.right=180;
+sun.shadow.camera.top=180;sun.shadow.camera.bottom=-180;
+sun.shadow.bias=-0.00015;
+sun.shadow.camera.updateProjectionMatrix();
+scene.add(sun);
+
+function material(color){return new THREE.MeshStandardMaterial({color,roughness:.8})}
+
+const water=new THREE.Mesh(
+ new THREE.PlaneGeometry(180,180),material(0x2186b2)
+);
+water.rotation.x=-Math.PI/2;
+water.position.y=-1;
+scene.add(water);
+
+const island=new THREE.Mesh(
+ new THREE.CylinderGeometry(34,38,2,64),
+ material(0x69a967)
+);
+island.position.y=-.1;
+island.receiveShadow=true;
+scene.add(island);
+
+const city=new THREE.Group();
+scene.add(city);
+
+const buildings=[];
+const trafficLights=[];
+let trafficPhase=0;
+let selected='house';
+let rotation=0;
+let demolish=false;
+let money=0;
+let freeHouses=3;
+let population=120;
+let day=1;
+let cityName='місто';
+let country='Україна';
+let weather='Сонячно';
+let season='Весна';
+let weatherType='sun';
+let weatherParticles=null;
+let weatherParticleVelocities=[];
+const territoryStages=['Маленький острів','Місто','Мегаполіс','Країна','Світ','Місяць','Марс','Сонячна система','Галактика'];
+let territoryLevel=0;
+let territoryRadius=29;
+const territoryBaseNeeds={house:10,shop:3,power:1,parking:2,school:5};
+
+
+const prices={
+ house:325,
+ shop:900,
+ school:100,
+ park:500,
+ factory:1200,
+ power:1000,
+ road:120,
+ parking:450,
+ traffic:300,
+ rail:240,
+ roadrail:320,
+ hospital:2500, cafe:1200, supermarket:1800, office:2200, cinema:3000, firestation:1600,
+ library:1400, university:4200, stadium:5200, hotel:2800, bank:3500, police:2100, museum:2600, station:3800, warehouse:1700, waterplant:2400
+};
+
+function addBox(parent,w,h,d,color,x,y,z){
+ const mesh=new THREE.Mesh(
+  new THREE.BoxGeometry(w,h,d),material(color)
+ );
+ mesh.position.set(x,y,z);
+ mesh.castShadow=true;
+ mesh.receiveShadow=true;
+ parent.add(mesh);
+ return mesh;
+}
+
+function tree(x,z){
+ const g=new THREE.Group();
+ const trunk=addBox(g,.25,1,.25,0x795033,0,.5,0);
+ const leaves=new THREE.Mesh(
+  new THREE.IcosahedronGeometry(.8,1),
+  material(0x277c45)
+ );
+ leaves.position.y=1.35;
+ leaves.castShadow=true;
+ g.add(leaves);
+ g.position.set(x,1,z);
+ city.add(g);
+}
+
+// Дерева на межі володіння створюються окремою функцією нижче.
+
+function road(x,z,rot=0){
+ const g=new THREE.Group();
+ g.position.set(x,0.9,z);
+ city.add(g);
+ return g;
+}
+
+// Автоматичне формування доріг
+function updateRoadNetwork(){
+ const roads=buildings.filter(b=>b.type==='road'||b.type==='roadrail');
+
+ roads.forEach(b=>{
+  const g=b.roadGroup||b.group;
+
+  // Очищаємо стару форму дороги
+  while(g.children.length){
+   const obj=g.children[0];
+   g.remove(obj);
+   if(obj.geometry)obj.geometry.dispose();
+  }
+
+  const has=(dx,dz)=>roads.some(r=>
+   Math.abs(r.x-(b.x+dx))<0.1 &&
+   Math.abs(r.z-(b.z+dz))<0.1
+  );
+
+  let east=has(5,0);
+  let west=has(-5,0);
+  let south=has(0,5);
+  let north=has(0,-5);
+
+  // Окрема дорога за замовчуванням пряма
+  if(!east&&!west&&!north&&!south){
+   east=true;
+   west=true;
+  }
+
+  const asphalt=0x252d38;
+
+  // Центральна частина
+  addBox(g,3.6,.2,3.6,asphalt,0,.12,0);
+
+  // З'єднувальні частини
+  if(east)addBox(g,.7,.2,3.6,asphalt,2.15,.12,0);
+  if(west)addBox(g,.7,.2,3.6,asphalt,-2.15,.12,0);
+  if(south)addBox(g,3.6,.2,.7,asphalt,0,.12,2.15);
+  if(north)addBox(g,3.6,.2,.7,asphalt,0,.12,-2.15);
+
+  // Розмітка для прямих доріг
+  if(east&&west&&!north&&!south){
+   addBox(g,1.1,.04,.13,0xffdf83,0,.24,0);
+  }else if(north&&south&&!east&&!west){
+   addBox(g,.13,.04,1.1,0xffdf83,0,.24,0);
+  }
+ });
+}
+
+function railCurvePoint(curve,u){
+ const p0=curve.from.map(v=>v*2.5),p3=curve.to.map(v=>v*2.5);
+ const p1=[p0[0]-curve.from[0]*1.38,p0[1]-curve.from[1]*1.38];
+ const p2=[p3[0]-curve.to[0]*1.38,p3[1]-curve.to[1]*1.38];
+ const v=1-u;
+ return [v*v*v*p0[0]+3*v*v*u*p1[0]+3*v*u*u*p2[0]+u*u*u*p3[0],v*v*v*p0[1]+3*v*v*u*p1[1]+3*v*u*u*p2[1]+u*u*u*p3[1]];
+}
+function makeRailGeometry(g,track=null){
+ while(g.children.length){const obj=g.children[0];g.remove(obj);if(obj.geometry)obj.geometry.dispose();}
+ if(track&&track.curve){
+  const pts=[];for(let i=0;i<=32;i++){const q=railCurvePoint(track.curve,i/32);pts.push(new THREE.Vector3(q[0],.27,q[1]));}
+  const path=new THREE.CatmullRomCurve3(pts);
+  for(const side of [-.78,.78]){
+   const shifted=[];
+   for(let i=0;i<=32;i++){
+    const u=i/32,q=railCurvePoint(track.curve,u),a=railCurvePoint(track.curve,Math.min(1,u+.002)),b=railCurvePoint(track.curve,Math.max(0,u-.002));
+    const dx=a[0]-b[0],dz=a[1]-b[1],len=Math.hypot(dx,dz)||1;
+    shifted.push(new THREE.Vector3(q[0]+dz/len*side,.27,q[1]-dx/len*side));
+   }
+   const railPath=new THREE.CatmullRomCurve3(shifted);
+   const mesh=new THREE.Mesh(new THREE.TubeGeometry(railPath,48,.09,7,false),material(0x9aa7ae));mesh.castShadow=true;g.add(mesh);
+  }
+  for(let i=0;i<=8;i++){
+   const u=i/8,q=railCurvePoint(track.curve,u),a=railCurvePoint(track.curve,Math.min(1,u+.01)),b=railCurvePoint(track.curve,Math.max(0,u-.01));
+   const angle=Math.atan2(a[0]-b[0],a[1]-b[1]);
+   const sleeper=new THREE.Mesh(new THREE.BoxGeometry(2.25,.13,.22),material(0x76543a));sleeper.position.set(q[0],.12,q[1]);sleeper.rotation.y=angle;g.add(sleeper);
+  }
+  return;
+ }
+ // Пряма ділянка колії.
+ for(let k=-2.25;k<=2.26;k+=.75)addBox(g,2.25,.13,.22,0x76543a,0,.12,k);
+ for(const side of [-.78,.78]){
+  const railMesh=new THREE.Mesh(new THREE.BoxGeometry(.16,.2,5.05),material(0x9aa7ae));
+  railMesh.position.set(side,.27,0);railMesh.castShadow=true;g.add(railMesh);
+ }
+}
+
+// Автоматично визначаємо прямі ділянки та 90-градусні повороти за сусідніми рейками.
+function updateRailNetwork(){
+ const rails=buildings.filter(b=>b.type==='rail'||b.type==='roadrail');
+ rails.forEach(b=>{
+  const railSurface=b.railGroup||b.group;
+  const near=rails.filter(r=>r!==b && Math.hypot(r.x-b.x,r.z-b.z)<5.25);
+  const dirs=[];
+  near.forEach(r=>{
+   const dx=r.x-b.x,dz=r.z-b.z;
+   if(Math.abs(dx)>Math.abs(dz))dirs.push([Math.sign(dx),0]);
+   else dirs.push([0,Math.sign(dz)]);
+  });
+  b.curve=null;
+  // Якщо від плитки йдуть рівно дві перпендикулярні гілки — створюємо плавний вигин.
+  if(dirs.length===2 && dirs[0][0]!==dirs[1][0] && dirs[0][1]!==dirs[1][1]){
+   b.curve={from:dirs[0],to:dirs[1]};railSurface.rotation.y=0;
+  }else{
+   const alongX=dirs.filter(d=>d[0]!==0).length,alongZ=dirs.length-alongX;
+   if(alongX>alongZ)railSurface.rotation.y=Math.PI/2;
+   else if(alongZ>alongX)railSurface.rotation.y=0;
+   else if(dirs.length)railSurface.rotation.y=dirs[0][0]!==0?Math.PI/2:0;
+  }
+  makeRailGeometry(railSurface,b);
+ });
+}
+
+function build(type,x,z,rot=0){
+ if(type==='roadrail'){
+  const wrapper=new THREE.Group();
+  wrapper.position.set(x,.9,z);
+  city.add(wrapper);
+  const roadSurface=new THREE.Group();
+  const railSurface=new THREE.Group();
+  wrapper.add(roadSurface);
+  wrapper.add(railSurface);
+  buildings.push({
+   type,x,z,group:wrapper,
+   roadGroup:roadSurface,railGroup:railSurface,
+   paidCost:0
+  });
+  updateRoadNetwork();
+  updateRailNetwork();
+  return;
+ }
+ if(type==='rail'){
+  const g=new THREE.Group();makeRailGeometry(g);
+  g.position.set(x,.9,z);g.rotation.y=rot;city.add(g);
+  buildings.push({type,x,z,group:g,paidCost:0});
+  updateRailNetwork();return;
+ }
+ if(type==='road'){
+  const r=road(x,z,rot);
+  buildings.push({type,x,z,group:r,paidCost:0});
+  updateRoadNetwork();
+  return;
+ }
+ const g=new THREE.Group();
+
+ if(type==='parking'){
+ // Добре помітна парковка на поверхні острова
+ addBox(g,5,.16,5,0x252d36,0,.12,0);
+ addBox(g,5.15,.12,.18,0xe6edf2,0,.22,-2.48);
+ addBox(g,5.15,.12,.18,0xe6edf2,0,.22,2.48);
+ for(let i=-1;i<=1;i++){
+  addBox(g,.10,.035,4.25,0xffffff,i*1.5,.225,0);
+ }
+ addBox(g,4.4,.04,.14,0xffd45c,0,.23,2.15);
+ const parkedColors=[0x2788d8,0xe0a13a];
+ parkedColors.forEach((color,i)=>{
+  const car=new THREE.Group();
+  addBox(car,1.05,.38,1.75,color,0,.43,0);
+  addBox(car,.72,.32,.82,0x9bd8ed,0,.77,-.05);
+  for(const wx of [-.34,.34]){
+   for(const wz of [-.58,.58]){
+    const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.16,.16,.12,12),material(0x171717));
+    wheel.rotation.z=Math.PI/2;
+    wheel.position.set(wx,.22,wz);
+    car.add(wheel);
+   }
+  }
+  car.position.set(i===0?-.75:.75,.25,i===0?-.45:.45);
+  g.add(car);
+ });
+ addBox(g,.12,1.45,.12,0xe6edf2,-2.15,.82,-2.05);
+ addBox(g,.65,.62,.10,0x1769aa,-2.15,1.55,-2.05);
+ addBox(g,.18,.38,.04,0xffffff,-2.15,1.55,-1.99);
+}
+
+else if(type==='traffic'){
+ // Стовп
+ addBox(g,.18,3,.18,0x333333,0,1.5,0);
+
+ // Корпус світлофора
+ addBox(g,.65,1.6,.45,0x202020,0,3.5,0);
+
+ // Три сигнали
+ const colors=[0xff2222,0xffcc22,0x22dd55];
+ const lamps=[];
+ colors.forEach((color,i)=>{
+  const light=new THREE.Mesh(
+   new THREE.SphereGeometry(.2,16,12),
+   new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:.25})
+  );
+  light.position.set(0,4.05-i*.55,.25);
+  g.add(light);
+  lamps.push(light);
+ });
+ trafficLights.push({group:g,lamps});
+ updateTrafficLights();
+
+}
+else if(type==='park'){
+  addBox(g,4,.15,4,0x65aa5b,0,.1,0);
+   const positions=[
+   [-1,-1],
+   [1,-1],
+   [-1,1],
+   [1,1]
+  ];
+
+  positions.forEach(([tx,tz])=>{
+   treeInGroup(g,tx,tz);
+  });
+ }else{
+  let w=3.7,d=3.7,h=4.5,color=0xe6d6b8;
+  if(type==='shop'){h=3.4;color=0xe9a35e}
+  if(type==='school'){h=4.2;color=0xd8e6ee}
+  if(type==='factory'){w=4.6;d=4.3;h=4;color=0x8797a5}
+  if(type==='power'){h=3;color=0xd9e2e8}
+  if(type==='hospital'){w=5.2;d=4.8;h=5.2;color=0xf0f3f5}
+  if(type==='cafe'){w=4.2;d=3.8;h=3.5;color=0xd99a69}
+  if(type==='supermarket'){w=5.2;d=4.8;h=4;color=0xe9e2c9}
+  if(type==='office'){w=4.4;d=4.4;h=7;color=0x9eb9c9}
+  if(type==='cinema'){w=5.4;d=4.8;h=4.6;color=0x514a68}
+  if(type==='firestation'){w=5;d=4.6;h=4;color=0xd85b4d}
+  if(type==='library'){w=4.8;d=4.2;h=4.5;color=0xb88b62}
+  if(type==='university'){w=6;d=5;h=5.5;color=0xd9d6c8}
+  if(type==='stadium'){w=8;d=7;h=2.2;color=0x477d58}
+  if(type==='hotel'){w=4.8;d=4.6;h=8;color=0xc9b2a0}
+  if(type==='bank'){w=4.8;d=4.2;h=5;color=0x9caebc}
+  if(type==='police'){w=4.8;d=4.2;h=4;color=0x54718f}
+  if(type==='museum'){w=5.4;d=4.8;h=4.8;color=0xd7c7a5}
+  if(type==='station'){w=6.5;d=4.8;h=4.2;color=0x879eaa}
+  if(type==='warehouse'){w=6;d=5;h=3.8;color=0x9babb4}
+  if(type==='waterplant'){w=5.2;d=4.8;h=3.8;color=0x75aebc}
+  addBox(g,w,h,d,color,0,h/2,0);
+  addBox(g,w+.15,.25,d+.15,0x52677c,0,h+.12,0);
+
+  if(type==='house'){
+   for(let y=1.2;y<h;y+=1.4){
+    addBox(g,.55,.55,.08,0x82d8e9,-1,y,d/2+.05);
+    addBox(g,.55,.55,.08,0x82d8e9,1,y,d/2+.05);
+   }
+  }
+  if(type==='shop'){
+   addBox(g,2,.5,.1,0xffd36b,0,2.5,d/2+.07);
+  }
+  if(type==='school'){
+   addBox(g,1.5,1,.1,0x83d9ee,0,2,d/2+.08);
+  }
+  if(type==='factory'){
+   const chimney=new THREE.Mesh(
+    new THREE.CylinderGeometry(.35,.4,3,12),
+    material(0x647585)
+   );
+   chimney.position.set(1.2,5,.7);
+   g.add(chimney);
+  }
+  if(type==='hospital'){
+   addBox(g,.28,2.4,.12,0xd83b3b,0,3,d/2+.08);
+   addBox(g,1.25,.28,.12,0xd83b3b,0,3,d/2+.09);
+  }
+  if(type==='cafe'){
+   addBox(g,2.2,.7,.12,0x5b3427,0,2.15,d/2+.08);
+   addBox(g,2.3,.22,.2,0xffd36b,0,3.1,0);
+  }
+  if(type==='supermarket'){
+   addBox(g,3.4,.55,.12,0x2e8b57,0,2.8,d/2+.08);
+   for(let i=-1;i<=1;i++)addBox(g,.7,1.1,.1,0x8bd5ee,i*1.3,1.25,d/2+.09);
+  }
+  if(type==='office'){
+   for(let y=1.5;y<h;y+=1.5)for(let x of [-1.35,0,1.35])addBox(g,.65,.72,.08,0x9ce0f2,x,y,d/2+.08);
+  }
+  if(type==='cinema'){
+   addBox(g,3.2,1.15,.12,0x201b2b,0,2.25,d/2+.08);
+   addBox(g,2.8,.12,.14,0xe7b84c,0,3.05,d/2+.1);
+  }
+  if(type==='firestation'){
+   addBox(g,2.6,2.1,.14,0x343b46,0,1.2,d/2+.08);
+   addBox(g,2.6,.18,.18,0xffd45c,0,2.35,d/2+.1);
+  }
+  if(type==='library'){
+   addBox(g,2.5,.55,.14,0x6a432d,0,2.8,d/2+.08);
+   for(let x of [-1.2,0,1.2])addBox(g,.12,1.5,.12,0xf0dca7,x,1.35,d/2+.1);
+  }
+  if(type==='university'){
+   addBox(g,4.5,.35,.18,0x6c5540,0,3.6,d/2+.1);
+   for(let x=-2;x<=2;x++)addBox(g,.18,2.5,.18,0xf2e6c8,x*.8,1.35,d/2+.12);
+   addBox(g,5,.18,.5,0x6c5540,0,4.05,d/2+.08);
+  }
+  if(type==='stadium'){
+   addBox(g,5,.22,4,0x3c9b55,0,2.35,0);
+   for(let x of [-3.2,3.2])addBox(g,.55,1.5,5.5,0xd7dce2,x,1.5,0);
+   addBox(g,2.2,.8,.18,0xffffff,0,1.1,d/2+.12);
+  }
+  if(type==='hotel'){
+   for(let y=1.4;y<h;y+=1.35)for(let x of [-1.55,0,1.55])addBox(g,.75,.65,.09,0x9ce0f2,x,y,d/2+.08);
+   addBox(g,2.5,.55,.14,0x8b2938,0,h-.8,d/2+.1);
+  }
+  if(type==='bank'){
+   addBox(g,4.3,.35,.22,0xd7bd70,0,3.9,d/2+.1);
+   for(let x of [-1.5,-.5,.5,1.5])addBox(g,.22,2.5,.22,0xe8e0cf,x,1.35,d/2+.12);
+  }
+  if(type==='police'){
+   addBox(g,2.7,.65,.14,0x1d3858,0,2.7,d/2+.1);
+   addBox(g,.8,.2,.18,0xff4545,-.25,3.15,d/2+.12);
+   addBox(g,.8,.2,.18,0x398cff,.55,3.15,d/2+.12);
+  }
+  if(type==='museum'){
+   addBox(g,5.1,.35,.2,0xf0e5cf,0,3.5,d/2+.1);
+   for(let x of [-1.8,-.6,.6,1.8])addBox(g,.2,2.4,.2,0xf4ead7,x,1.25,d/2+.12);
+   addBox(g,5.4,.22,.35,0x9a825d,0,4.05,0);
+  }
+  if(type==='station'){
+   addBox(g,5.8,.25,.18,0x344d62,0,3.35,d/2+.1);
+   addBox(g,5.8,.18,.2,0xf0c65b,0,3.65,d/2+.12);
+   for(let x of [-2,-.7,.7,2])addBox(g,.7,1.25,.1,0x9ed9ec,x,1.1,d/2+.1);
+  }
+  if(type==='warehouse'){
+   addBox(g,2.5,2.2,.16,0x596c78,0,1.2,d/2+.1);
+   addBox(g,2.2,.18,.2,0xf0b94a,0,2.4,d/2+.12);
+  }
+  if(type==='waterplant'){
+   for(let x of [-1.5,0,1.5]){
+    const tank=new THREE.Mesh(new THREE.CylinderGeometry(.75,.75,2.5,20),material(0x9ed8e6));
+    tank.position.set(x,2.1,0);g.add(tank);
+    addBox(g,1.2,.12,1.2,0xd8f3f8,x,3.4,0);
+   }
+   addBox(g,3.8,.25,.2,0x2d7f9c,0,3.8,d/2+.1);
+  }
+  if(type==='power'){
+   const orb=new THREE.Mesh(
+    new THREE.SphereGeometry(.6,16,12),
+    material(0xffd166)
+   );
+   orb.position.y=3.8;
+   g.add(orb);
+  }
+ }
+
+ g.position.set(x,.9,z);
+ g.rotation.y=rot;
+ city.add(g);
+ buildings.push({type,x,z,group:g,paidCost:0});
+}
+
+function treeInGroup(g,x,z){
+ const t=new THREE.Mesh(
+  new THREE.CylinderGeometry(.1,.15,.7,7),
+  material(0x795033)
+ );
+ t.position.set(x,.45,z);t.castShadow=true;g.add(t);
+ const l=new THREE.Mesh(
+  new THREE.IcosahedronGeometry(.5,1),
+  material(0x277c45)
+ );
+ l.position.set(x,1,z);l.castShadow=true;g.add(l);
+}
+
+// 🌲 Жива межа території — кільце дерев точно біля краю володіння.
+let territoryFence=null;
+function rebuildTerritoryFence(){
+ if(territoryFence)city.remove(territoryFence);
+ territoryFence=new THREE.Group();
+ const fenceRadius=Math.max(10,territoryRadius-3.5);
+ const count=Math.max(32,Math.round(2*Math.PI*fenceRadius/3.5));
+ for(let i=0;i<count;i++){
+  const a=i/count*Math.PI*2;
+  const x=Math.cos(a)*fenceRadius,z=Math.sin(a)*fenceRadius;
+  const trunk=new THREE.Mesh(new THREE.CylinderGeometry(.16,.22,2.0,8),material(0x68452d));
+  trunk.position.set(x,1.0,z);trunk.castShadow=true;territoryFence.add(trunk);
+  const crown=new THREE.Mesh(new THREE.ConeGeometry(1.05,2.35,8),material(0x286b3c));
+  crown.position.set(x,2.95,z);crown.castShadow=true;territoryFence.add(crown);
+  const crownTop=new THREE.Mesh(new THREE.ConeGeometry(.76,1.75,8),material(0x39834a));
+  crownTop.position.set(x,3.75,z);crownTop.castShadow=true;territoryFence.add(crownTop);
+ }
+ city.add(territoryFence);
+}
+rebuildTerritoryFence();
+
+build('road',0,0);
+build('road',5,0);
+build('road',-5,0);
+build('road',0,5,Math.PI/2);
+build('road',0,-5,Math.PI/2);
+
+build('house',-5,5);
+build('house',5,5);
+build('shop',-5,-5);
+build('park',5,-5);
+// 🚗 СИСТЕМА МАШИН
+
+// 🚦 СИСТЕМА СВІТЛОФОРІВ
+
+function updateTrafficLights(){
+ trafficLights.forEach(({lamps})=>{
+  lamps.forEach((lamp,i)=>{
+   const active=(i===trafficPhase);
+   const colors=[0xff2222,0xffcc22,0x22dd55];
+   lamp.material.color.setHex(active?colors[i]:0x252b30);
+   lamp.material.emissive.setHex(active?colors[i]:0x080808);
+   lamp.material.emissiveIntensity=active?1.1:.05;
+  });
+ });
+}
+updateTrafficLights();
+setInterval(()=>{trafficPhase=(trafficPhase+1)%3;updateTrafficLights();},3000);
+const cars=[];
+
+function createCar(color,x,z,speed){
+ const car=new THREE.Group();
+
+ // Корпус
+ addBox(car,1.8,.55,1,color,-0.2,.55,0);
+
+ // Кабіна
+ addBox(car,.9,.55,.85,0x8bd5ee,.1,1.05,0);
+
+ // Колеса
+ for(const wx of [-.7,.6]){
+  for(const wz of [-.58,.58]){
+   const wheel=new THREE.Mesh(
+    new THREE.CylinderGeometry(.22,.22,.15,16),
+    material(0x171717)
+   );
+   wheel.rotation.x=Math.PI/2;
+   wheel.position.set(wx,.25,wz);
+   car.add(wheel);
+   if(!car.userData.wheels){
+ car.userData.wheels=[];
+}
+car.userData.wheels.push(wheel);
+  }
+ }
+
+ car.position.set(x,1.1,z);
+ city.add(car);
+
+ cars.push({
+  group:car,
+  speed:speed,
+  start:x,
+  direction:1,
+  turning:false
+ });
+}
+
+// Дві машини різних кольорів
+// Traffic spawns from the loaded road network.
+
+
+// 🚘 ОСОБИСТИЙ АВТОМОБІЛЬ: купівля та керування від першої особи
+// 🚦 РУХ МАШИН ПО РЕАЛЬНИХ ДОРОГАХ МІСТА
+let roadNodes=[];
+let roadNodeMap=new Map();
+function rebuildTrafficRoadGraph(){
+ roadNodes=[];roadNodeMap=new Map();
+ for(const b of buildings.filter(b=>b.type==='road'||b.type==='roadrail')){
+  const n={x:b.x,z:b.z,neighbors:[]};roadNodes.push(n);
+  roadNodeMap.set(`${Math.round(b.x/5)},${Math.round(b.z/5)}`,n);
+ }
+ for(const n of roadNodes)for(const [dx,dz] of [[5,0],[-5,0],[0,5],[0,-5]]){
+  const other=roadNodeMap.get(`${Math.round((n.x+dx)/5)},${Math.round((n.z+dz)/5)}`);
+  if(other)n.neighbors.push(other);
+ }
+ roadNodes=roadNodes.filter(n=>n.neighbors.length>0);
+}
+function chooseRoadNext(car,node){
+ const options=node.neighbors.filter(n=>n!==car.previous),pool=options.length?options:node.neighbors;
+ if(!pool.length)return null;
+ if(car.from){const dx=node.x-car.from.x,dz=node.z-car.from.z;
+  const straight=pool.filter(n=>n.x-node.x===dx&&n.z-node.z===dz);
+  if(straight.length&&Math.random()<.72)return straight[0];}
+ return pool[Math.floor(Math.random()*pool.length)];
+}
+function setRoadCarPose(car){
+ const a=car.from,b=car.to,dx=b.x-a.x,dz=b.z-a.z,len=Math.hypot(dx,dz)||1,t=car.progress,lane=car.lane;
+ car.group.position.set(a.x+dx*t+(dz/len)*lane,1.1,a.z+dz*t-(dx/len)*lane);
+ car.group.rotation.y=Math.atan2(-dx,-dz);
+}
+function resetRoadTraffic(){
+ for(const c of cars)city.remove(c.group);cars.length=0;rebuildTrafficRoadGraph();
+ const usable=roadNodes;if(usable.length<2)return;
+ const colors=[0xe53935,0x2979ff,0xf4c542,0x42a56a,0x9b59b6,0xf08a35];
+ const count=Math.min(6,Math.max(2,Math.floor(usable.length/5)));
+ for(let i=0;i<count;i++){
+  const from=usable[Math.floor(i*usable.length/count)],to=from.neighbors[i%from.neighbors.length];
+  createCar(colors[i%colors.length],from.x,from.z,0);const car=cars[cars.length-1];
+  car.from=from;car.to=to;car.previous=null;car.progress=.12+(i%3)*.07;
+  car.lane=i%2===0?-1.35:1.35;car.cruiseSpeed=2.0+(i%3)*.25;setRoadCarPose(car);
+ }
+}
+function updateRoadTraffic(dt){
+ for(const car of cars){
+  const a=car.from,b=car.to;if(!a||!b)continue;
+  const dx=b.x-a.x,dz=b.z-a.z,len=Math.hypot(dx,dz)||1;
+  const nextP=Math.min(1,car.progress+car.cruiseSpeed*dt/len),lane=car.lane;
+  const nx=a.x+dx*nextP+(dz/len)*lane,nz=a.z+dz*nextP-(dx/len)*lane;
+  let blocked=false;
+  for(const other of cars){
+   if(other===car)continue;
+   const odx=other.to.x-other.from.x,odz=other.to.z-other.from.z,olen=Math.hypot(odx,odz)||1;
+   const parallel=Math.abs((dx/len)*(odz/olen)-(dz/len)*(odx/olen))<.18;
+   // Паралельні зустрічні смуги не блокують одна одну; одна смуга тримає дистанцію.
+   if(parallel&&Math.abs(car.lane-other.lane)>1.5)continue;
+   if(Math.hypot(nx-other.group.position.x,nz-other.group.position.z)<3.8){blocked=true;break;}
+  }
+  if(!blocked&&playerCar&&Math.hypot(nx-playerCar.position.x,nz-playerCar.position.z)<3.8)blocked=true;
+  if(!blocked)car.progress=nextP;
+  if(car.progress>=.999){const arrived=car.to,next=chooseRoadNext(car,arrived);
+   if(next){car.previous=car.from;car.from=arrived;car.to=next;car.progress=0;}else car.progress=.98;}
+  setRoadCarPose(car);car.group.userData.wheels.forEach(w=>{if(!blocked)w.rotation.x+=car.cruiseSpeed*dt*2;});
+ }
+}
+function resetRoadCitizens(){
+ for(const person of citizens)city.remove(person.group);citizens.length=0;rebuildTrafficRoadGraph();
+ const roads=roadNodes;if(!roads.length)return;const count=Math.min(36,roads.length*2);
+ for(let i=0;i<count;i++){
+  const node=roads[i%roads.length],next=node.neighbors[i%node.neighbors.length];createCitizen(i);
+  const person=citizens[citizens.length-1];person.from=node;person.to=next;person.progress=(i%6)/6;
+  person.speed=.45+(i%4)*.08;person.lane=i%2===0?2.55:-2.55;
+ }
+}
+function updateRoadCitizens(dt){
+ for(const person of citizens){if(!person.from||!person.to)continue;
+  const a=person.from,b=person.to,dx=b.x-a.x,dz=b.z-a.z,len=Math.hypot(dx,dz)||1;
+  person.progress+=person.speed*dt/len;
+  if(person.progress>=1){const arrived=person.to,opts=arrived.neighbors.filter(n=>n!==person.from);
+   person.from=arrived;person.to=opts.length?opts[Math.floor(Math.random()*opts.length)]:person.from;person.progress=0;}
+  const t=person.progress,lane=person.lane;
+  person.group.position.set(a.x+dx*t+(dz/len)*lane,1.2,a.z+dz*t-(dx/len)*lane);
+  person.group.rotation.y=Math.atan2(-dx,-dz);
+ }
+}
+
+// 🤖 МІСЬКІ РОБОТИ: невеликі сервісні роботи патрулюють тротуари.
+let cityRobots=[];
+function makeCityRobot(color){
+ const g=new THREE.Group();
+ const shell=material(color),dark=material(0x263746),glow=material(0x73e7ff);
+ const part=(w,h,d,mat,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);g.add(m);return m;};
+ part(.62,.58,.38,shell,0,.98,0);
+ part(.52,.43,.42,shell,0,1.52,0);
+ part(.13,.12,.06,glow,-.13,1.57,-.22);part(.13,.12,.06,glow,.13,1.57,-.22);
+ part(.12,.35,.13,dark,-.39,1.02,0);part(.12,.35,.13,dark,.39,1.02,0);
+ part(.16,.42,.18,dark,-.17,.3,0);part(.16,.42,.18,dark,.17,.3,0);
+ part(.06,.22,.06,dark,0,1.88,0);
+ const tip=new THREE.Mesh(new THREE.SphereGeometry(.09,8,8),glow);tip.position.set(0,2.02,0);g.add(tip);
+ g.userData.legs=g.children.slice(-3,-1);
+ return g;
+}
+function resetCityRobots(){
+ for(const r of cityRobots)city.remove(r.group);cityRobots.length=0;
+ const nodes=roadNodes.length?roadNodes:[{x:0,z:0,neighbors:[]}];
+ const colors=[0x4f9bb7,0x6b9e73,0xc18b4e,0x8c78b8];
+ const count=Math.min(4,Math.max(2,Math.ceil(nodes.length/8)));
+ for(let i=0;i<count;i++){
+  const from=nodes[(i*3)%nodes.length],opts=from.neighbors||[],to=opts.length?opts[i%opts.length]:null;
+  const group=makeCityRobot(colors[i%colors.length]);
+  const lane=i%2===0?3.15:-3.15;
+  group.position.set(from.x,0,from.z+lane);city.add(group);
+  cityRobots.push({group,from,to,progress:0,lane,speed:1.0+i*.12,phase:i*.9});
+ }
+}
+function updateCityRobots(dt){
+ for(const robot of cityRobots){
+  if(!robot.from||!robot.to){robot.group.rotation.y+=dt*.25;continue;}
+  const a=robot.from,b=robot.to,dx=b.x-a.x,dz=b.z-a.z,len=Math.hypot(dx,dz)||1;
+  robot.progress+=robot.speed*dt/len;
+  if(robot.progress>=1){
+   const arrived=robot.to,opts=arrived.neighbors.filter(n=>n!==robot.from);
+   robot.from=arrived;robot.to=opts.length?opts[Math.floor(Math.random()*opts.length)]:null;robot.progress=0;
+  }
+  if(robot.to){const t=robot.progress,lane=robot.lane;
+   robot.group.position.set(a.x+dx*t+(dz/len)*lane,0,a.z+dz*t-(dx/len)*lane);
+   robot.group.rotation.y=Math.atan2(-dx,-dz);
+  }
+  const bob=Math.sin(performance.now()*.006+robot.phase)*.025;
+  robot.group.position.y=bob;
+ }
+}
+
+const VEHICLES={
+ car:{name:'Авто',price:100000,speed:13,reverse:7,color:0x1769aa},
+ motorcycle:{name:'Мотоцикл',price:65000,speed:19,reverse:8,color:0xe5a126},
+ lamborghini:{name:'Ламба',price:250000,speed:24,reverse:9,color:0xd92e25},
+ suv:{name:'Позашляховик',price:160000,speed:11,reverse:6,color:0x536b45}
+};
+let playerVehicleType='car';
+let ownedVehicles=[];
+let playerCarOwned=false;
+let playerCar=null;
+let playerDriving=false;
+let playerCarYaw=0;
+const drivingKeys={};
+const garagePanel=document.getElementById('garagePanel');
+const garageToggle=document.getElementById('garageToggle');
+const driveCarButton=document.getElementById('driveCar');
+const relocateCarButton=document.getElementById('relocateCar');
+const driveHud=document.getElementById('driveHud');
+
+function findPlayerCarSpawn(){
+ rebuildTrafficRoadGraph();
+ let best=null,bestClearance=-Infinity;
+ for(const from of roadNodes){
+  for(const to of from.neighbors){
+   const dx=to.x-from.x,dz=to.z-from.z,len=Math.hypot(dx,dz)||1;
+   const yaw=Math.atan2(-dx,-dz);
+   for(const lane of [-1.35,1.35]){
+    const x=(from.x+to.x)/2+(dz/len)*lane;
+    const z=(from.z+to.z)/2-(dx/len)*lane;
+    let clearance=100;
+    for(const car of cars)clearance=Math.min(clearance,Math.hypot(x-car.group.position.x,z-car.group.position.z)-3.4);
+    for(const b of buildings){
+     if(b.type==='road'||b.type==='traffic')continue;
+     clearance=Math.min(clearance,Math.hypot(x-b.x,z-b.z)-3.2);
+    }
+    if(clearance>bestClearance){bestClearance=clearance;best={x,z,yaw};}
+   }
+  }
+ }
+ return best||{x:0,z:0,yaw:0};
+}
+
+function createPlayerCar(x=0,z=10,yaw=0,type=playerVehicleType){
+ const g=new THREE.Group(),spec=VEHICLES[type]||VEHICLES.car;
+ const wheels=[];
+ if(type==='motorcycle'){
+  addBox(g,.48,.48,1.65,spec.color,0,.83,0);
+  addBox(g,.38,.58,.55,0x252b32,0,1.25,-.05);
+  addBox(g,.28,.25,.12,0xfff2b0,0,1.05,-.86);
+  for(const wz of [-.72,.72]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.39,.39,.18,16),material(0x171717));w.rotation.z=Math.PI/2;w.position.set(0,.43,wz);g.add(w);wheels.push(w);}
+ }else{
+  const width=type==='suv'?2.25:2.0,length=type==='lamborghini'?4.2:4.0;
+  addBox(g,width,.72,length,spec.color,0,.72,0);
+  addBox(g,type==='suv'?1.72:1.5,type==='suv'?1.0:.65,type==='lamborghini'?1.65:1.8,type==='lamborghini'?0x343a42:0x8bd5ee,0,type==='suv'?1.55:1.34,.2);
+  addBox(g,1.8,.18,1.05,0x123d5c,0,1.12,-1.35);
+  addBox(g,.38,.18,.08,0xfff2b0,-.65,.78,-2.02);addBox(g,.38,.18,.08,0xfff2b0,.65,.78,-2.02);
+  addBox(g,.35,.2,.08,0xff3030,-.7,.78,2.02);addBox(g,.35,.2,.08,0xff3030,.7,.78,2.02);
+  for(const wx of [-1,1])for(const wz of [-1.25,1.25]){const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.22,18),material(0x171717));wheel.rotation.z=Math.PI/2;wheel.position.set(wx,.43,wz);g.add(wheel);wheels.push(wheel);}
+ }
+ g.position.set(x,.9,z);
+ g.rotation.y=yaw;
+ g.userData.wheels=wheels;
+ city.add(g);
+ return g;
+}
+
+garageToggle.onclick=()=>{garagePanel.style.display=garagePanel.style.display==='none'?'flex':'none';};
+garagePanel.querySelectorAll('[data-vehicle]').forEach(button=>button.onclick=()=>{
+ const type=button.dataset.vehicle,spec=VEHICLES[type],alreadyOwned=ownedVehicles.includes(type);
+ if(!alreadyOwned){
+  if(money<spec.price){notify(`Для покупки потрібно ₡ ${spec.price.toLocaleString('uk-UA')}`);return;}
+  money-=spec.price;ownedVehicles.push(type);
+ }else if(playerVehicleType===type){notify(`${spec.name} вже обрано!`);return;}
+ playerVehicleType=type;playerCarOwned=true;
+ if(playerCar){city.remove(playerCar);playerCar=null;}
+ const spawn=findPlayerCarSpawn();playerCarYaw=spawn.yaw;playerCar=createPlayerCar(spawn.x,spawn.z,playerCarYaw,type);
+ driveCarButton.disabled=false;relocateCarButton.disabled=false;garagePanel.style.display='none';
+ garagePanel.querySelectorAll('[data-vehicle]').forEach(b=>{const v=VEHICLES[b.dataset.vehicle];b.textContent=ownedVehicles.includes(b.dataset.vehicle)?(playerVehicleType===b.dataset.vehicle?`✓ ${v.name} — обрано`:`↪ ${v.name} — вибрати`):`${v.name} · ₡ ${v.price.toLocaleString('uk-UA')}`;});
+ saveGame();update();notify(alreadyOwned?`${spec.name} обрано!`:`${spec.name} куплено! Тепер його можна обрати в гаражі.`);
+});
+
+function relocatePlayerCar(){
+ if(!playerCarOwned||!playerCar)return;
+ const wasDriving=playerDriving;
+ if(wasDriving)setDriving(false);
+ rebuildTrafficRoadGraph();
+ const oldYaw=playerCarYaw;
+ const candidates=[];
+ for(const from of roadNodes){
+  for(const to of from.neighbors){
+   const dx=to.x-from.x,dz=to.z-from.z,len=Math.hypot(dx,dz)||1;
+   const yaw=Math.atan2(-dx,-dz);
+   for(const lane of [-1.35,1.35]){
+    const x=(from.x+to.x)/2+(dz/len)*lane;
+    const z=(from.z+to.z)/2-(dx/len)*lane;
+    candidates.push({x,z,yaw,distance:Math.hypot(x-playerCar.position.x,z-playerCar.position.z)});
+   }
+  }
+ }
+ candidates.sort((a,b)=>b.distance-a.distance);
+ let destination=null;
+ for(const spot of candidates){
+  if(spot.x < -territoryRadius+4 || spot.x > territoryRadius-4 || spot.z < -territoryRadius+4 || spot.z > territoryRadius-4)continue;
+  playerCarYaw=spot.yaw;
+  if(!playerCarBlocked(spot.x,spot.z)){destination=spot;break;}
+ }
+ playerCarYaw=oldYaw;
+ if(!destination){notify('Не знайшов вільного місця на дорозі. Спробуй звільнити ділянку!');return;}
+ playerCar.position.set(destination.x,.9,destination.z);
+ playerCarYaw=destination.yaw;
+ playerCar.rotation.y=playerCarYaw;
+ playerCar.userData.wheels.forEach(w=>w.rotation.x=0);
+ saveGame();
+ update();
+ notify('Автомобіль переміщено на вільну ділянку дороги!');
+}
+relocateCarButton.onclick=relocatePlayerCar;
+
+function clearDrivingKeys(){Object.keys(drivingKeys).forEach(k=>drivingKeys[k]=false);}
+function setDriving(active){
+ if(active && !playerCarOwned)return;
+ playerDriving=active;
+ driveHud.style.display=active?'block':'none';
+ driveCarButton.textContent=active?'🚪 Вийти з авто':'🔑 Сісти за кермо';
+ if(active){
+  setManualRotate(false);
+  orbit360=false;document.getElementById('orbit360').textContent='🔄 Огляд 360°';
+  renderer.domElement.focus({preventScroll:true});
+ }else{
+  clearDrivingKeys();
+  radius=25; height=1.0;
+ }
+}
+driveCarButton.onclick=()=>setDriving(!playerDriving);
+
+// Керування за фізичними клавішами (e.code), щоб WASD працювало
+// і з українською, і з англійською розкладкою клавіатури.
+const drivingCodeMap={
+ KeyW:'w',KeyA:'a',KeyS:'s',KeyD:'d',
+ ArrowUp:'arrowup',ArrowDown:'arrowdown',ArrowLeft:'arrowleft',ArrowRight:'arrowright'
+};
+function getDrivingKey(e){
+ return drivingCodeMap[e.code] || (['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(String(e.key).toLowerCase())?String(e.key).toLowerCase():null);
+}
+function onDrivingKeyDown(e){
+ if(!playerDriving)return;
+ const key=getDrivingKey(e);
+ if(key){drivingKeys[key]=true;e.preventDefault();e.stopImmediatePropagation();return;}
+ if(e.code==='Escape'||String(e.key).toLowerCase()==='escape'){
+  e.preventDefault();e.stopImmediatePropagation();setDriving(false);
+ }
+}
+function onDrivingKeyUp(e){
+ const key=getDrivingKey(e);
+ if(key){drivingKeys[key]=false;if(playerDriving)e.preventDefault();}
+}
+window.addEventListener('keydown',onDrivingKeyDown,true);
+document.addEventListener('keydown',onDrivingKeyDown,true);
+window.addEventListener('keyup',onDrivingKeyUp,true);
+document.addEventListener('keyup',onDrivingKeyUp,true);
+window.addEventListener('blur',clearDrivingKeys);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)clearDrivingKeys();});
+window.addEventListener('keydown',e=>{if(!trainDriving)return;const map={KeyW:'forward',ArrowUp:'forward',KeyS:'backward',ArrowDown:'backward'};const k=map[e.code];if(k){trainKeys[k]=true;e.preventDefault();e.stopImmediatePropagation();}if(e.code==='KeyE'){setTrainDriving(false);e.preventDefault();e.stopImmediatePropagation();}},true);
+window.addEventListener('keyup',e=>{const map={KeyW:'forward',ArrowUp:'forward',KeyS:'backward',ArrowDown:'backward'};const k=map[e.code];if(k){trainKeys[k]=false;if(trainDriving)e.preventDefault();}},true);
+
+// Перевірка зіткнення двох прямокутників на площині (OBB/SAT).
+// Враховує поворот будівлі та габарити автомобіля.
+function rectanglesOverlap(ax,az,ahx,ahz,ayaw,bx,bz,bhx,bhz,byaw){
+ const axes=[
+  [Math.cos(ayaw),Math.sin(ayaw)],[-Math.sin(ayaw),Math.cos(ayaw)],
+  [Math.cos(byaw),Math.sin(byaw)],[-Math.sin(byaw),Math.cos(byaw)]
+ ];
+ const dx=bx-ax,dz=bz-az;
+ for(const [ux,uz] of axes){
+  const distance=Math.abs(dx*ux+dz*uz);
+  const ra=ahx*Math.abs(Math.cos(ayaw)*ux+Math.sin(ayaw)*uz)+ahz*Math.abs(-Math.sin(ayaw)*ux+Math.cos(ayaw)*uz);
+  const rb=bhx*Math.abs(Math.cos(byaw)*ux+Math.sin(byaw)*uz)+bhz*Math.abs(-Math.sin(byaw)*ux+Math.cos(byaw)*uz);
+  if(distance>ra+rb)return false;
+ }
+ return true;
+}
+function playerCarBlocked(x,z){
+ // Спершу дешевий радіусний фільтр, щоб не перевіряти далекі споруди.
+ for(const b of buildings){
+  if(b.type==='road'||b.type==='rail'||b.type==='roadrail')continue;
+  const dx=x-b.x,dz=z-b.z;
+  if(Math.abs(dx)>7||Math.abs(dz)>7)continue;
+  let hx=1.9,hz=1.9;
+  if(['factory','hospital','supermarket','cinema','firestation'].includes(b.type)){hx=2.8;hz=2.6;}
+  else if(b.type==='office'){hx=2.4;hz=2.4;}
+  else if(b.type==='cafe'){hx=2.2;hz=2.0;}
+  else if(b.type==='parking'){hx=2.55;hz=2.55;}
+  else if(b.type==='park'){hx=2.05;hz=2.05;}
+  else if(b.type==='traffic'){hx=.48;hz=.48;}
+  if(rectanglesOverlap(x,z,1.05,2.05,playerCarYaw,b.x,b.z,hx,hz,b.group.rotation.y))return true;
+ }
+ for(const car of cars){
+  if(Math.abs(x-car.group.position.x)<3.2&&Math.abs(z-car.group.position.z)<4.2&&
+     Math.hypot(x-car.group.position.x,z-car.group.position.z)<3.8)return true;
+ }
+ return false;
+}
+function updatePlayerCar(dt){
+ if(!playerDriving||!playerCar)return;
+ const forward=drivingKeys.w||drivingKeys.arrowup;
+ const backward=drivingKeys.s||drivingKeys.arrowdown;
+ const left=drivingKeys.a||drivingKeys.arrowleft;
+ const right=drivingKeys.d||drivingKeys.arrowright;
+ const vehicle=VEHICLES[playerVehicleType]||VEHICLES.car;
+ let speed=forward?vehicle.speed:backward?-vehicle.reverse:0;
+ if(left)playerCarYaw+=2.0*dt*(speed<0?-1:1);
+ if(right)playerCarYaw-=2.0*dt*(speed<0?-1:1);
+ playerCar.rotation.y=playerCarYaw;
+ const moveX=-Math.sin(playerCarYaw)*speed*dt;
+ const moveZ=-Math.cos(playerCarYaw)*speed*dt;
+ // Дрібні кроки не дають машині «проскочити» крізь стіну на високій швидкості.
+ const steps=Math.max(1,Math.ceil(Math.hypot(moveX,moveZ)/.22));
+ let moved=0;
+ for(let i=0;i<steps;i++){
+  const nx=playerCar.position.x+moveX/steps;
+  const nz=playerCar.position.z+moveZ/steps;
+  if(nx < -territoryRadius+3 || nx > territoryRadius-3 || nz < -territoryRadius+3 || nz > territoryRadius-3)break;
+  if(playerCarBlocked(nx,nz))break;
+  playerCar.position.x=nx;playerCar.position.z=nz;moved++;
+ }
+ if(moved)playerCar.userData.wheels.forEach(w=>w.rotation.x+=speed*dt*2*(moved/steps));
+}
+
+// 🚆 ЗАЛІЗНИЦЯ ТА КЕРОВАНИЙ ПОТЯГ
+let trainGroup=null,trainDriving=false,trainTrack=null,trainT=0,trainDirection=-1,trainSpeed=0,trainYaw=0,trainStoppedAt=null;
+const trainKeys={};
+const trainHud=document.getElementById('trainHud');
+const trainRideButton=document.getElementById('trainRide');
+function railPoint(track,t){
+ if(track.curve){const q=railCurvePoint(track.curve,(t+2.5)/5);return {x:track.x+q[0],z:track.z+q[1]};}
+ const surface=track.railGroup||track.group;
+ const a=surface.rotation.y;
+ return {x:track.x+Math.sin(a)*t,z:track.z+Math.cos(a)*t};
+}
+function railTangent(track,t){
+ const p=railPoint(track,Math.min(2.5,t+.04)),q=railPoint(track,Math.max(-2.5,t-.04));
+ const dx=p.x-q.x,dz=p.z-q.z,len=Math.hypot(dx,dz)||1;return {x:dx/len,z:dz/len};
+}
+function nearestRail(x,z,max=Infinity){
+ let best=null,bestD=Infinity,bestT=0;
+ for(const b of buildings){if(b.type!=='rail'&&b.type!=='roadrail')continue;
+  let t=0,d=Infinity;
+  if(b.curve){for(let sample=-2.5;sample<=2.501;sample+=.08){const q=railPoint(b,sample),dd=Math.hypot(x-q.x,z-q.z);if(dd<d){d=dd;t=sample;}}}
+  else{const a=(b.railGroup||b.group).rotation.y,dx=x-b.x,dz=z-b.z;t=Math.max(-2.5,Math.min(2.5,dx*Math.sin(a)+dz*Math.cos(a)));const q=railPoint(b,t);d=Math.hypot(x-q.x,z-q.z);}
+  if(d<bestD){bestD=d;best=b;bestT=t;}
+ }
+ return bestD<=max?{track:best,t:bestT,d:bestD}:null;
+}
+function createTrain(){
+ const g=new THREE.Group();
+ // Локомотив
+ addBox(g,2.15,1.15,3.5,0x245a87,0,1.0,0);
+ addBox(g,1.55,1.05,1.45,0x2d78a8,0,2.0,-.45);
+ addBox(g,1.25,.62,.12,0x9bd9ec,0,2.05,-1.2);
+ addBox(g,.65,.5,.12,0xffd36b,0,1.05,-1.8);
+ const chimney=new THREE.Mesh(new THREE.CylinderGeometry(.18,.25,.65,12),material(0x333b43));chimney.position.set(0,2.0,.95);g.add(chimney);
+ // Пасажирський вагон позаду локомотива
+ const wagon=new THREE.Group();
+ addBox(wagon,2.05,1.35,3.7,0xb94c3e,0,1.05,3.65);
+ addBox(wagon,1.8,.7,3.25,0x9bd9ec,0,1.35,3.65);
+ for(const z of [2.35,3.35,4.35,5.0])for(const x of [-1,1]){
+  const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.34,.34,.18,14),material(0x25292d));wheel.rotation.z=Math.PI/2;wheel.position.set(x,.42,z);g.add(wheel);
+ }
+ g.add(wagon);
+ for(const z of [-.9,.9,2.8,4.5])for(const x of [-.95,.95]){
+  const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.34,.34,.18,14),material(0x25292d));wheel.rotation.z=Math.PI/2;wheel.position.set(x,.42,z);g.add(wheel);
+ }
+ g.userData.wheels=g.children.filter(c=>c.geometry&&c.geometry.type==='CylinderGeometry');
+ city.add(g);return g;
+}
+function setTrainDriving(active){
+ trainDriving=active;trainHud.style.display=active?'block':'none';
+ trainRideButton.textContent=active?'🚪 Вийти з потяга':'🚆 Сісти в потяг';
+ if(active){if(playerWalking)togglePedestrian(false);if(playerDriving)setDriving(false);setManualRotate(false);orbit360=false;}
+ else{trainSpeed=0;Object.keys(trainKeys).forEach(k=>trainKeys[k]=false);}
+}
+function boardTrain(){
+ if(trainDriving){setTrainDriving(false);return;}
+ if(!playerWalking){notify('Увімкни режим пішохода та підійди до вокзалу');return;}
+ const station=buildings.filter(b=>b.type==='station').map(b=>({b,d:Math.hypot(pedestrian.position.x-b.x,pedestrian.position.z-b.z)})).sort((a,b)=>a.d-b.d)[0];
+ if(!station||station.d>13){notify('Підійди ближче до вокзалу (до 13 метрів)');return;}
+ const found=nearestRail(station.b.x,station.b.z,16);
+ if(!found){notify('Побудуй рейки біля вокзалу, щоб потяг мав де їхати');return;}
+ if(trainGroup)city.remove(trainGroup);
+ trainTrack=found.track;trainT=found.t;trainDirection=-1;trainSpeed=0;
+ trainGroup=createTrain();
+ const pos=railPoint(trainTrack,trainT);trainGroup.position.set(pos.x,.9,pos.z);trainYaw=Math.atan2(railTangent(trainTrack,trainT).x,railTangent(trainTrack,trainT).z);trainGroup.rotation.y=trainYaw;
+ setTrainDriving(true);notify('Ти в потязі! W — їхати, S — гальмувати/назад.');
+}
+trainRideButton.onclick=boardTrain;
+function nextRailAt(track,endT,dir){
+ const end=railPoint(track,endT);let best=null,bestScore=-Infinity;
+ for(const b of buildings){if((b.type!=='rail'&&b.type!=='roadrail')||b===track)continue;
+  for(const t of [-2.5,2.5]){
+   const q=railPoint(b,t),d=Math.hypot(q.x-end.x,q.z-end.z);if(d>2.7)continue;
+   const oldTangent=railTangent(track,endT),oldVec={x:oldTangent.x*dir,z:oldTangent.z*dir};
+   const newDir=t<0?1:-1,newTangent=railTangent(b,t);
+   const newVec={x:newTangent.x*newDir,z:newTangent.z*newDir};
+   const dot=oldVec.x*newVec.x+oldVec.z*newVec.z;
+   const score=dot*10-d;
+   if(dot>.35&&score>bestScore){bestScore=score;best={track:b,t,direction:newDir};}
+  }
+ }
+ return best;
+}
+function updateTrain(dt){
+ if(!trainGroup||!trainTrack)return;
+ if(trainDriving){
+  if(trainKeys.forward)trainSpeed=Math.min(18,trainSpeed+4.8*dt);
+  else if(trainKeys.backward)trainSpeed=Math.max(-4,trainSpeed-10*dt);
+  else trainSpeed*=Math.pow(.38,dt);
+  let move=trainSpeed*dt*trainDirection;
+  let guard=0;
+  while(Math.abs(move)>.0001&&guard++<4){
+   const dir=move>0?1:-1,remaining=dir>0?2.5-trainT:trainT+2.5;
+   const step=Math.min(Math.abs(move),Math.max(0,remaining));trainT+=dir*step;move-=dir*step;
+   if(Math.abs(move)>.0001){
+    const next=nextRailAt(trainTrack,dir>0?2.5:-2.5,dir);
+    if(!next){trainT=dir>0?2.5:-2.5;trainSpeed=0;move=0;notify('Кінець колії! Добудуй рейки, щоб продовжити маршрут.');}
+    else{trainTrack=next.track;trainT=next.t;trainDirection=next.direction;}
+   }
+  }
+  // Вокзал поруч із колією працює як справжня зупинка: потяг пригальмовує біля платформи.
+  let nearbyStop=null,stopDistance=Infinity,stopT=0;
+  for(const station of buildings){if(station.type!=='station')continue;
+   let tBest=0,d=Infinity;
+   for(let sample=-2.5;sample<=2.501;sample+=.1){const q=railPoint(trainTrack,sample),dd=Math.hypot(station.x-q.x,station.z-q.z);if(dd<d){d=dd;tBest=sample;}}
+   const t=tBest;
+   if(d<5&&Math.abs(t-trainT)<stopDistance){nearbyStop=station;stopDistance=Math.abs(t-trainT);stopT=t;}
+  }
+  if(trainStoppedAt&&(!nearbyStop||nearbyStop!==trainStoppedAt||Math.abs(stopT-trainT)>2.2))trainStoppedAt=null;
+  if(nearbyStop&&nearbyStop!==trainStoppedAt&&stopDistance<.65){trainT=stopT;trainSpeed=0;trainStoppedAt=nearbyStop;notify('🚉 Зупинка: '+(nearbyStop.name||'Вокзал')+'. Натисни W, щоб їхати далі.');}
+ }
+ const pos=railPoint(trainTrack,trainT);trainGroup.position.set(pos.x,.9,pos.z);
+ const tangent=railTangent(trainTrack,trainT);
+ trainYaw=Math.atan2(tangent.x,tangent.z)+(trainDirection>0?Math.PI:0);trainGroup.rotation.y=trainYaw;
+}
+
+// 🚶 РЕЖИМ ПІШОХОДА: прогулянки містом та відвідування будівель
+let playerWalking=false,playerFirstPerson=false,playerYaw=0;
+let pedestrianInterior=null,interiorBuilding=null,returnPedestrianPosition=null;
+let pedestrianJump=0,pedestrianJumpVelocity=0,pedestrianHeadPitch=0,cinemaSeated=false,homeBuildingPosition=null;
+const productInventory={};
+const productCatalog={bread:{name:'Хліб',price:25},milk:{name:'Молоко',price:35},apple:{name:'Яблука',price:20},cheese:{name:'Сир',price:55},water:{name:'Вода',price:15},chocolate:{name:'Шоколад',price:40}};
+const shopPanel=document.getElementById('shopPanel');
+const cinemaHud=document.getElementById('cinemaHud');
+const homeHud=document.getElementById('homeHud');
+let pointerLookPitch=0;
+const pedestrianKeys={};
+const pedestrianToggle=document.getElementById('pedestrianToggle');
+const pedestrianHud=document.getElementById('pedestrianHud');
+const pedestrian=new THREE.Group();
+const avatarBody=new THREE.Mesh(new THREE.CapsuleGeometry(.28,.62,4,8),material(0x2678b8));
+avatarBody.position.y=.78;pedestrian.add(avatarBody);
+const avatarHead=new THREE.Mesh(new THREE.SphereGeometry(.22,12,10),material(0xf0c7a5));
+avatarHead.position.y=1.35;pedestrian.add(avatarHead);
+const avatarLegs=[];
+for(const side of [-1,1]){const leg=new THREE.Mesh(new THREE.BoxGeometry(.13,.48,.16),material(0x263746));leg.position.set(side*.12,.24,0);pedestrian.add(leg);avatarLegs.push(leg);}
+pedestrian.position.set(0,.9,9.5);city.add(pedestrian);
+function nearestHouse(){
+ let found=null,dist=Infinity;
+ for(const b of buildings){if(b.type!=='house')continue;const d=Math.hypot(pedestrian.position.x-b.x,pedestrian.position.z-b.z);if(d<dist){dist=d;found=b;}}
+ return dist<6?found:null;
+}
+document.getElementById('markHome').onclick=()=>{
+ if(playerWalking&&homeBuildingPosition&&Math.hypot(pedestrian.position.x-homeBuildingPosition.x,pedestrian.position.z-homeBuildingPosition.z)>7){pedestrian.position.set(homeBuildingPosition.x+4,.9,homeBuildingPosition.z);notify('Повернувся додому');return;}
+ if(!playerWalking){notify('Спочатку увімкни режим пішохода');return;}
+ const h=nearestHouse();
+ if(!h){notify('Підійди близько до свого будинку, щоб позначити його');return;}
+ homeBuildingPosition={x:h.x,z:h.z,rot:h.group.rotation.y};saveGame();notify('🏠 Дім позначено! Тепер можна повертатися сюди');
+};
+function refreshInventory(){
+ const items=Object.entries(productInventory).filter(([,n])=>n>0).map(([id,n])=>productCatalog[id].name+': '+n).join(' · ');
+ document.getElementById('inventoryLabel').textContent=items||'Кошик порожній';
+}
+document.querySelectorAll('[data-product]').forEach(btn=>btn.onclick=()=>{
+ const id=btn.dataset.product,item=productCatalog[id];
+ if(!item)return;
+ if(money<item.price){notify('Не вистачає грошей на '+item.name);return;}
+ money-=item.price;productInventory[id]=(productInventory[id]||0)+1;update();refreshInventory();saveGame();notify('Куплено: '+item.name);
+});
+document.getElementById('closeShop').onclick=()=>shopPanel.style.display='none';
+function openShop(){shopPanel.style.display='block';refreshInventory();}
+function toggleCinemaSeat(){
+ if(!pedestrianInterior||!interiorBuilding||interiorBuilding.type!=='cinema')return false;
+ cinemaSeated=!cinemaSeated;cinemaHud.style.display=cinemaSeated?'block':'none';
+ if(cinemaSeated){pedestrian.position.set(10000,.9,10003.2);playerYaw=0;notify('Сідаєш у крісло. Приємного перегляду!');}
+ else{pedestrian.position.set(10000,.9,10001.5);notify('Ти встав із крісла');}
+ return true;
+}
+function togglePedestrian(active){
+ if(active&&trainDriving)setTrainDriving(false);
+ if(active&&playerDriving&&playerCar){
+  const ex=playerCar.position.x+Math.cos(playerCarYaw)*2.6;
+  const ez=playerCar.position.z-Math.sin(playerCarYaw)*2.6;
+  setDriving(false);
+  if(!pedestrianBlocked(ex,ez)){pedestrian.position.set(ex,.9,ez);playerYaw=playerCarYaw;}
+ }
+ playerWalking=active;
+ pedestrian.visible=active&&!playerFirstPerson&&!pedestrianInterior;
+ pedestrianToggle.textContent=active?'🚶 Вийти з режиму':'🚶 Пішохід';
+ pedestrianHud.style.display=active?'block':'none';
+ if(active){setManualRotate(false);orbit360=false;renderer.domElement.focus({preventScroll:true});notify('Режим пішохода: клікни по грі, щоб захопити мишку; WASD — рух, пробіл — стрибок');}
+ else{clearPedestrianKeys();if(pedestrianInterior)exitBuilding();}
+}
+pedestrianToggle.onclick=()=>togglePedestrian(!playerWalking);
+function clearPedestrianKeys(){Object.keys(pedestrianKeys).forEach(k=>pedestrianKeys[k]=false);}
+function pedestrianBlocked(x,z){
+ if(pedestrianInterior)return Math.abs(x-10000)>4.7||Math.abs(z-10000)>4.7;
+ if(Math.abs(x)>territoryRadius-2||Math.abs(z)>territoryRadius-2)return true;
+ for(const b of buildings){
+  if(['road','rail','park','traffic','parking'].includes(b.type))continue;
+  let hx=2.0,hz=2.0;
+  if(['factory','hospital','supermarket','cinema','firestation'].includes(b.type)){hx=2.8;hz=2.6;}
+  if(b.type==='office'){hx=2.4;hz=2.4;}
+  if(rectanglesOverlap(x,z,.28,.28,0,b.x,b.z,hx,hz,b.group.rotation.y))return true;
+ }
+ return false;
+}
+function createInterior(type){
+ if(pedestrianInterior)scene.remove(pedestrianInterior);
+ const g=new THREE.Group();g.position.set(10000,0,10000);
+ const floorColor=type==='cafe'?0x9a7656:type==='cinema'?0x292333:type==='house'?0xb58d68:0xb9c4c9;
+ addBox(g,10,.18,10,floorColor,0,.05,0);
+ addBox(g,10,3,.18,0xe1e8eb,0,1.55,-5);
+ addBox(g,.18,3,10,0xd5dfe4,-5,1.55,0);addBox(g,.18,3,10,0xd5dfe4,5,1.55,0);
+ addBox(g,10,3,.18,0xe1e8eb,0,1.55,5);
+ if(type==='shop'||type==='supermarket'){
+  for(const x of [-3,0,3]){addBox(g,.35,1.8,3.5,0x6c7882,x,.95,-.7);for(let y=.35;y<1.8;y+=.55){addBox(g,.42,.07,3.6,0xd7e0e5,x,y,-.7);for(let z=-1.8;z<=.4;z+=1.1){const colors=[0xe85d4f,0x5ca7d8,0x73b96c,0xf0c44f];const prod=new THREE.Mesh(new THREE.BoxGeometry(.28,.28,.28),material(colors[Math.floor(Math.random()*colors.length)]));prod.position.set(x,y+.2,z);g.add(prod);}}}
+ }else if(type==='house'){
+  addBox(g,2.2,.8,1.2,0x805637,0,.45,2.5);addBox(g,1.1,.65,.9,0x547b9a,-2,.4,-2);addBox(g,1.3,.15,1.3,0x9a7656,2,.1,-2);
+  addBox(g,1.2,.15,.7,0x8a5b37,0,.95,3.5);
+ }else if(type==='cafe'){
+  for(const x of [-2,2]){addBox(g,1.4,.16,1.1,0x75452e,x,.85,-1);addBox(g,.12,.8,.12,0x493329,x,.4,-1);}
+  addBox(g,3,.9,.7,0x79543c,0,.55,3.5);
+ }else if(type==='cinema'){
+  addBox(g,5,2,.15,0x1b1426,0,1.7,-4.75);
+  // Яскрава проєкція на екрані: стилізована рухома космічна сцена.
+  addBox(g,4.55,1.55,.035,0x172d59,0,1.72,-4.64);
+  const filmPlanet=new THREE.Mesh(new THREE.SphereGeometry(.48,16,12),material(0x43b8d8));filmPlanet.position.set(-1.1,1.85,-4.59);g.add(filmPlanet);
+  const filmMoon=new THREE.Mesh(new THREE.SphereGeometry(.22,12,10),material(0xe7c46a));filmMoon.position.set(1.15,1.35,-4.58);g.add(filmMoon);
+  for(let i=0;i<12;i++){const star=new THREE.Mesh(new THREE.SphereGeometry(.035,6,6),material(0xffffff));star.position.set(-2+Math.random()*4,1.1+Math.random()*1.3,-4.57);g.add(star);}
+  for(let x=-3;x<=3;x+=2){addBox(g,1.1,.65,.9,0x9b3946,x,.4,1.5);addBox(g,1.15,.12,.95,0x392a34,x,.78,1.5);}
+ }else{
+  for(const x of [-3.5,3.5])for(const z of [-1,2]){
+   addBox(g,1.0,1.7,2.5,0x8b9ca4,x,.95,z);
+   for(let y=.5;y<1.7;y+=.6)addBox(g,1.08,.06,2.55,0xe5edf0,x,y,z);
+  }
+  addBox(g,2.6,1.0,.8,0x8a5b37,0,.55,3.7);
+ }
+ pedestrianInterior=g;scene.add(g);return g;
+}
+function enterBuilding(b){
+ returnPedestrianPosition={x:pedestrian.position.x,z:pedestrian.position.z,yaw:playerYaw};
+ interiorBuilding=b;b.group.visible=false;createInterior(b.type);
+ pedestrian.position.set(10000,.9,10000);pedestrian.visible=!playerFirstPerson;
+ pedestrianInterior.visible=true;cinemaSeated=false;
+ if(b.type==='shop'||b.type==='supermarket')openShop();
+ if(b.type==='cinema')notify('Обери місце в залі й натисни E, щоб сісти');
+ else if(b.type==='house'){homeHud.style.display='block';notify('Ти вдома! Можеш відпочити та вийти клавішею E');}
+ else notify('Ти всередині: E — вийти назовні');
+}
+function exitBuilding(){
+ if(interiorBuilding)interiorBuilding.group.visible=true;
+ if(pedestrianInterior){scene.remove(pedestrianInterior);pedestrianInterior=null;}
+ shopPanel.style.display='none';cinemaHud.style.display='none';homeHud.style.display='none';cinemaSeated=false;
+ interiorBuilding=null;
+ if(returnPedestrianPosition){pedestrian.position.set(returnPedestrianPosition.x,.9,returnPedestrianPosition.z);playerYaw=returnPedestrianPosition.yaw;}
+ returnPedestrianPosition=null;pedestrian.visible=playerWalking&&!playerFirstPerson;
+ notify('Ти вийшов із будівлі');
+}
+function interactPedestrian(){
+ if(pedestrianInterior){if(interiorBuilding&&interiorBuilding.type==='cinema'&&!cinemaSeated){toggleCinemaSeat();return;}if(cinemaSeated){toggleCinemaSeat();return;}exitBuilding();return;}
+ let nearest=null,dist=Infinity;
+ for(const b of buildings){
+  if(!['house','shop','supermarket','cafe','cinema','hospital','office','firestation','school'].includes(b.type))continue;
+  const d=Math.hypot(pedestrian.position.x-b.x,pedestrian.position.z-b.z);
+  if(d<dist){dist=d;nearest=b;}
+ }
+ if(nearest&&dist<4.2){enterBuilding(nearest);return;}
+ notify('Підійди ближче до магазину, кафе чи іншої будівлі та натисни E');
+}
+function updatePedestrian(dt){
+ if(!playerWalking)return;
+ const f=pedestrianKeys.w||pedestrianKeys.arrowup,b=pedestrianKeys.s||pedestrianKeys.arrowdown;
+ const l=pedestrianKeys.a||pedestrianKeys.arrowleft,r=pedestrianKeys.d||pedestrianKeys.arrowright;
+ if(l)playerYaw+=2.5*dt;if(r)playerYaw-=2.5*dt;
+ pedestrian.rotation.y=playerYaw;
+ const speed=pedestrianInterior?(cinemaSeated?0:4):5;
+ if(pedestrianJump>0||pedestrianJumpVelocity>0){pedestrianJump+=pedestrianJumpVelocity*dt;pedestrianJumpVelocity-=18*dt;if(pedestrianJump<0){pedestrianJump=0;pedestrianJumpVelocity=0;}}
+ pedestrian.position.y=.9+pedestrianJump;
+ const move=(f?1:0)-(b?1:0),dx=-Math.sin(playerYaw)*move*speed*dt,dz=-Math.cos(playerYaw)*move*speed*dt;
+ const steps=Math.max(1,Math.ceil(Math.hypot(dx,dz)/.16));let moved=false;
+ for(let i=0;i<steps;i++){
+  const nx=pedestrian.position.x+dx/steps,nz=pedestrian.position.z+dz/steps;
+  if(!pedestrianBlocked(nx,nz)){pedestrian.position.x=nx;pedestrian.position.z=nz;moved=true;}
+ }
+ pedestrian.visible=!playerFirstPerson;
+ if(moved){const swing=Math.sin(performance.now()*.012)*.35;avatarLegs[0].rotation.x=swing;avatarLegs[1].rotation.x=-swing;}
+}
+function handlePedestrianKey(e){
+ if(!playerWalking)return;
+ if(e.code==='F5'){
+  playerFirstPerson=!playerFirstPerson;pedestrian.visible=!playerFirstPerson&&!pedestrianInterior;
+  notify(playerFirstPerson?'Камера від першої особи':'Камера від третьої особи');
+  e.preventDefault();e.stopImmediatePropagation();return;
+ }
+ if(e.code==='Space'&&!pedestrianInterior&&!cinemaSeated&&pedestrianJump===0){pedestrianJumpVelocity=7.2;e.preventDefault();e.stopImmediatePropagation();return;}
+ if(e.code==='KeyE'){
+  interactPedestrian();e.preventDefault();e.stopImmediatePropagation();return;
+ }
+ if(e.code==='Escape'){
+  if(document.pointerLockElement===renderer.domElement){return;}
+  if(pedestrianInterior)exitBuilding();else togglePedestrian(false);
+  e.preventDefault();e.stopImmediatePropagation();return;
+ }
+ const map={KeyW:'w',KeyA:'a',KeyS:'s',KeyD:'d',ArrowUp:'arrowup',ArrowDown:'arrowdown',ArrowLeft:'arrowleft',ArrowRight:'arrowright'};
+ if(map[e.code]){pedestrianKeys[map[e.code]]=true;e.preventDefault();e.stopImmediatePropagation();}
+}
+function handlePedestrianKeyUp(e){
+ const map={KeyW:'w',KeyA:'a',KeyS:'s',KeyD:'d',ArrowUp:'arrowup',ArrowDown:'arrowdown',ArrowLeft:'arrowleft',ArrowRight:'arrowright'};
+ if(map[e.code]){pedestrianKeys[map[e.code]]=false;if(playerWalking)e.preventDefault();}
+}
+renderer.domElement.addEventListener('click',()=>{if(playerWalking&&!shopPanel.style.display.includes('block')){if(document.pointerLockElement!==renderer.domElement&&renderer.domElement.requestPointerLock)renderer.domElement.requestPointerLock();}});
+document.addEventListener('mousemove',e=>{if(!playerWalking||document.pointerLockElement!==renderer.domElement)return;playerYaw-=e.movementX*.0025;pointerLookPitch=Math.max(-.65,Math.min(.65,pointerLookPitch+e.movementY*.002));});
+window.addEventListener('keydown',handlePedestrianKey,true);
+window.addEventListener('keyup',handlePedestrianKeyUp,true);
+window.addEventListener('blur',clearPedestrianKeys);
+
+// 👥 ЖИТЕЛІ МІСТА: невеликі пішоходи рухаються тротуарними маршрутами
+const citizens=[];
+function createCitizen(index){
+ const g=new THREE.Group();
+ const shirtColors=[0x3f91d2,0xe07b52,0x6dbb76,0xb18ad8,0xe2c35c];
+ const shirt=material(shirtColors[index%shirtColors.length]);
+ const body=new THREE.Mesh(new THREE.CylinderGeometry(.12,.16,.42,8),shirt);
+ body.position.y=.42;g.add(body);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.13,10,8),material(0xf0c7a5));
+ head.position.y=.72;g.add(head);
+ const legMat=material(0x263746);
+ for(const side of [-1,1]){
+  const leg=new THREE.Mesh(new THREE.BoxGeometry(.07,.25,.08),legMat);
+  leg.position.set(side*.07,.13,0);g.add(leg);
+ }
+ const alongX=index%2===0;
+ const lane=index%4<2?-1.25:1.25;
+ const direction=index%3===0?-1:1;
+ g.position.set(alongX?(Math.random()*14-7):lane,1.2,alongX?lane:(Math.random()*14-7));
+ city.add(g);
+ citizens.push({group:g,alongX,lane,direction,speed:.45+Math.random()*.35,phase:Math.random()*10});
+}
+// Citizens spawn along the loaded road network.
+
+// 🌦️ КЛІМАТ, ПОГОДА ТА ПОРИ РОКУ
+const seasonNames=['Весна','Літо','Осінь','Зима'];
+function createWeatherParticles(){
+ const count=weatherType==='rain'?420:weatherType==='snow'?260:0;
+ if(weatherParticles){scene.remove(weatherParticles);weatherParticles.geometry.dispose();weatherParticles.material.dispose();weatherParticles=null;}
+ weatherParticleVelocities=[];
+ if(!count)return;
+ const positions=new Float32Array(count*3);
+ for(let i=0;i<count;i++){
+  positions[i*3]=(Math.random()-.5)*75;
+  positions[i*3+1]=Math.random()*28+2;
+  positions[i*3+2]=(Math.random()-.5)*75;
+  weatherParticleVelocities.push(weatherType==='rain'?-(.25+Math.random()*.35):-(.035+Math.random()*.07));
+ }
+ const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+ const mat=new THREE.PointsMaterial({color:weatherType==='rain'?0xb7d9ed:0xffffff,size:weatherType==='rain'?.09:.16,transparent:true,opacity:weatherType==='rain'?.55:.9});
+ weatherParticles=new THREE.Points(geo,mat);scene.add(weatherParticles);
+}
+function applyWeather(){
+ const palettes={
+  sun:{sky:0x91c9e8,fog:0x91c9e8,light:2.5,water:0x2186b2},
+  cloudy:{sky:0x899aa7,fog:0x899aa7,light:1.55,water:0x287c9c},
+  rain:{sky:0x647887,fog:0x647887,light:1.1,water:0x1c6488},
+  snow:{sky:0xb9cbd8,fog:0xb9cbd8,light:1.65,water:0x5d9db6},
+  fog:{sky:0xaab8bd,fog:0xaab8bd,light:1.25,water:0x4c91a8},
+  storm:{sky:0x3e4b5b,fog:0x3e4b5b,light:.75,water:0x174b70}
+ };
+ const v=palettes[weatherType]||palettes.sun;
+ scene.background.setHex(v.sky);scene.fog.color.setHex(v.fog);sun.intensity=v.light;water.material.color.setHex(v.water);
+ createWeatherParticles();
+ document.getElementById('weatherLabel').textContent=weather;
+ document.getElementById('seasonLabel').textContent=season;
+}
+function advanceWeather(){
+ season=seasonNames[Math.floor(((day-1)%16)/4)];
+ const roll=Math.random();
+ if(season==='Зима'){
+  if(roll<.48){weather='Сніг';weatherType='snow';}
+  else if(roll<.72){weather='Хмарно';weatherType='cloudy';}
+  else if(roll<.9){weather='Туман';weatherType='fog';}
+  else{weather='Ясно';weatherType='sun';}
+ }else if(roll<.42){weather='Сонячно';weatherType='sun';}
+ else if(roll<.65){weather='Хмарно';weatherType='cloudy';}
+ else if(roll<.86){weather='Дощ';weatherType='rain';}
+ else if(roll<.96){weather='Туман';weatherType='fog';}
+ else{weather='Гроза';weatherType='storm';}
+ applyWeather();
+}
+advanceWeather();
+
+// 🏙️ РОЗВИТОК МІСТ СВІТУ: нові міста відкриваються зі зростанням населення
+const worldCities=[
+ {name:'місто',country:'Україна',need:0},
+ {name:'Харків',country:'Україна',need:200},
+ {name:'Київ',country:'Україна',need:450},
+ {name:'Львів',country:'Україна',need:800},
+ {name:'Одеса',country:'Україна',need:1200},
+ {name:'Дніпро',country:'Україна',need:1800},
+ {name:'Варшава',country:'Польща',need:2500},
+ {name:'Берлін',country:'Німеччина',need:3500},
+ {name:'Париж',country:'Франція',need:5000},
+ {name:'Токіо',country:'Японія',need:7500},
+ {name:'Торонто',country:'Канада',need:10000},
+ {name:'Нью-Йорк',country:'США',need:14000}
+];
+function refreshWorldCities(){
+ const select=document.getElementById('worldCitySelect');
+ const current=select.value;
+ select.innerHTML='';
+ const unlocked=worldCities.filter(c=>population>=c.need);
+ worldCities.forEach(c=>{
+  const option=document.createElement('option');
+  option.value=c.name;
+  option.textContent=population>=c.need?c.name+' — '+c.country:'🔒 '+c.name+' — '+c.need.toLocaleString('uk-UA')+' жителів';
+  option.disabled=population<c.need;
+  select.appendChild(option);
+ });
+ if(unlocked.some(c=>c.name===current))select.value=current;
+ else select.value=cityName;
+ document.getElementById('citiesLabel').textContent=unlocked.length;
+ document.getElementById('worldHint').textContent='Наступне місто: '+(worldCities.find(c=>population<c.need)?.name||'усі міста відкрито!');
+}
+document.getElementById('cityName').addEventListener('change',e=>{
+ cityName=e.target.value.trim().slice(0,24)||'місто';e.target.value=cityName;notify('Назву міста змінено: '+cityName);saveGame();
+});
+document.getElementById('countrySelect').addEventListener('change',e=>{
+ country=e.target.value;notify('Країну змінено: '+country);saveGame();
+});
+document.getElementById('worldCitySelect').addEventListener('change',e=>{
+ const chosen=worldCities.find(c=>c.name===e.target.value);
+ if(!chosen||population<chosen.need){refreshWorldCities();return;}
+ cityName=chosen.name;country=chosen.country;
+ document.getElementById('cityName').value=cityName;
+ document.getElementById('countrySelect').value=country;
+ notify('Тепер ти розвиваєш місто '+cityName+' ('+country+')');saveGame();
+});
+
+const raycaster=new THREE.Raycaster();
+const mouse=new THREE.Vector2();
+function groundPoint(e){
+ const rect=renderer.domElement.getBoundingClientRect();
+
+ mouse.x=(e.clientX-rect.left)/rect.width*2-1;
+ mouse.y=-(e.clientY-rect.top)/rect.height*2+1;
+
+ raycaster.setFromCamera(mouse,camera);
+
+ const hits=raycaster.intersectObject(island);
+
+ if(hits.length>0){
+  return hits[0].point;
+ }
+
+ return new THREE.Vector3(1000,0,1000);
+}
+
+function updateFloorButton(e){
+ if(selected!=='floor')return;
+
+ const p=groundPoint(e);
+
+ const houses=buildings
+  .filter(b=>b.type==='house')
+  .sort((a,b)=>
+   Math.hypot(a.x-p.x,a.z-p.z)-
+   Math.hypot(b.x-p.x,b.z-p.z)
+  );
+
+ const house=houses[0];
+ const button=document.getElementById('addFloor');
+
+ if(!house || Math.hypot(house.x-p.x,house.z-p.z)>5){
+  button.innerHTML='🏢 Додати поверх<br>за 300 кр.';
+  return;
+ }
+
+ const currentFloors=house.floors||1;
+ const floorCost=300+Math.floor((currentFloors-1)/3)*100;
+
+ button.innerHTML='🏢 Додати поверх<br>за '+floorCost+' кр.';
+}
+
+renderer.domElement.addEventListener('pointermove',updateFloorButton);
+document.getElementById('settings').onclick=()=>{
+ document.getElementById('settingsPanel').style.display='block';
+};
+
+document.getElementById('closeSettings').onclick=()=>{
+ document.getElementById('settingsPanel').style.display='none';
+};
+document.getElementById('restartGame').onclick=()=>{
+ const answer=confirm('Почати нову гру? Старе місто буде видалено.');
+
+ if(!answer)return;
+
+ clearInterval(autoSaveTimer);
+ localStorage.removeItem(SAVE_KEY);
+ localStorage.removeItem(DAY_KEY);
+
+ money=0;
+ freeHouses=3;
+ population=120;
+ day=1;
+
+ location.reload();
+};
+// 🎵 ЗАГАЛЬНА СИСТЕМА ЗВУКУ
+
+let audioCtx=null;
+let musicTimer=null;
+let musicOn=false;
+let noteIndex=0;
+
+const melody=[
+  261.63,329.63,392.00,329.63,
+  293.66,349.23,440.00,349.23,
+  261.63,329.63,392.00,523.25,
+  440.00,392.00,329.63,293.66
+];
+
+function playMusicNote(){
+ if(!audioCtx || !musicOn)return;
+
+ const osc=audioCtx.createOscillator();
+ const gain=audioCtx.createGain();
+
+ osc.type='sine';
+ osc.frequency.value=melody[noteIndex];
+
+ const now=audioCtx.currentTime;
+
+ gain.gain.setValueAtTime(0,now);
+ gain.gain.linearRampToValueAtTime(0.035,now+.15);
+ gain.gain.exponentialRampToValueAtTime(.001,now+1.5);
+
+ osc.connect(gain);
+ gain.connect(audioCtx.destination);
+
+ osc.start(now);
+ osc.stop(now+1.5);
+
+ noteIndex=(noteIndex+1)%melody.length;
+}
+
+async function startMusic(){
+ if(!audioCtx){
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+ }
+
+ await audioCtx.resume();
+
+ musicOn=true;
+ playMusicNote();
+
+ clearInterval(musicTimer);
+ musicTimer=setInterval(playMusicNote,900);
+
+ document.getElementById('soundToggle').textContent=
+  '🔊 Звук: Увімкнено';
+}
+
+function stopMusic(){
+ clearInterval(musicTimer);
+ musicTimer=null;
+ musicOn=false;
+
+ if(audioCtx)audioCtx.suspend();
+
+ document.getElementById('soundToggle').textContent=
+  '🔇 Звук: Вимкнено';
+}
+
+// 🔊 ЗВУКОВІ ЕФЕКТИ
+
+function playSound(type){
+ if(!musicOn || !audioCtx)return;
+
+ const sounds={
+  build:[520,760],
+  demolish:[420,180],
+  money:[660,880],
+  day:[440,660,880]
+ };
+
+ const notes=sounds[type];
+ if(!notes)return;
+
+ const osc=audioCtx.createOscillator();
+ const gain=audioCtx.createGain();
+ const now=audioCtx.currentTime;
+
+ osc.type='sine';
+ osc.frequency.setValueAtTime(notes[0],now);
+
+ notes.forEach((note,i)=>{
+  osc.frequency.setValueAtTime(note,now+i*.12);
+ });
+
+ gain.gain.setValueAtTime(.0001,now);
+ gain.gain.linearRampToValueAtTime(.12,now+.03);
+ gain.gain.exponentialRampToValueAtTime(.001,now+notes.length*.15);
+
+ osc.connect(gain);
+ gain.connect(audioCtx.destination);
+
+ osc.start(now);
+ osc.stop(now+notes.length*.15);
+}
+
+document.getElementById('soundToggle').onclick=()=>{
+ if(musicOn){
+  stopMusic();
+ }else{
+  startMusic();
+ }
+};
+function notify(text){
+ const m=document.getElementById('message');
+ m.textContent=text;
+ m.style.opacity=1;
+ clearTimeout(notify.timer);
+ notify.timer=setTimeout(()=>m.style.opacity=0,2000);
+}
+
+renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());
+
+renderer.domElement.addEventListener('pointerdown',e=>{
+ if(manualRotate||playerDriving||playerWalking)return;
+ if(e.button!==0)return;
+
+ const p=groundPoint(e);
+ let x=Math.round(p.x/5)*5;
+ let z=Math.round(p.z/5)*5;
+
+ if(selected==='traffic'){
+  const nearestRoad=buildings.filter(b=>b.type==='road')
+   .sort((a,b)=>Math.hypot(a.x-p.x,a.z-p.z)-Math.hypot(b.x-p.x,b.z-p.z))[0];
+  if(!nearestRoad || Math.hypot(nearestRoad.x-p.x,nearestRoad.z-p.z)>5.2){
+   notify('Клацни поруч із дорогою, щоб поставити світлофор!');return;
+  }
+  // Ставимо світлофор саме на найближчий край плитки дороги.
+  const sideX=p.x-nearestRoad.x,sideZ=p.z-nearestRoad.z;
+  if(Math.abs(sideX)>=Math.abs(sideZ)){
+   x=nearestRoad.x+(sideX>=0?2.25:-2.25);z=nearestRoad.z;
+  }else{
+   x=nearestRoad.x;z=nearestRoad.z+(sideZ>=0?2.25:-2.25);
+  }
+  if(buildings.some(b=>b.type==='traffic'&&Math.hypot(b.x-x,b.z-z)<2.2)){
+   notify('Біля цієї дороги вже є світлофор!');return;
+  }
+ }
+
+ if(!demolish && Math.hypot(x,z)>territoryRadius-5){notify("Це за межами твоєї території!");return;}
+
+ // ДОБУДОВА ПОВЕРХУ
+ // 🔄 ОБЕРТАННЯ ГОТОВИХ ОБ'ЄКТІВ
+if(selected==='rotate'){
+ const hits=raycaster.intersectObjects(
+  buildings.map(b=>b.group),
+  true
+ );
+
+ if(hits.length===0){
+  notify('Клацни на будинок або дорогу!');
+  return;
+ }
+
+ let obj=hits[0].object;
+
+ while(obj.parent && !buildings.some(b=>b.group===obj)){
+  obj=obj.parent;
+ }
+
+ const building=buildings.find(b=>b.group===obj);
+
+ if(!building){
+  notify('Не вдалося знайти об’єкт!');
+  return;
+ }
+
+ building.group.rotation.y+=Math.PI/2;
+
+ notify('Об’єкт повернуто на 90°!');
+ return;
+}
+ if(selected==='floor'){
+  const floorTypes=['house','shop','school','factory','power','hospital','cafe','supermarket','office','cinema','firestation'];
+  raycaster.setFromCamera(mouse,camera);
+  const hits=raycaster.intersectObjects(buildings.map(b=>b.group),true);
+  let target=null;
+  if(hits.length){
+   let obj=hits[0].object;
+   while(obj && !buildings.some(b=>b.group===obj))obj=obj.parent;
+   target=buildings.find(b=>b.group===obj)||null;
+  }
+  if(!target){
+   target=buildings
+    .filter(b=>floorTypes.includes(b.type))
+    .sort((a,b)=>Math.hypot(a.x-x,a.z-z)-Math.hypot(b.x-x,b.z-z))[0]||null;
+   if(target && Math.hypot(target.x-x,target.z-z)>4)target=null;
+  }
+  if(!target || !floorTypes.includes(target.type)){
+   notify('Натисни безпосередньо на хатинку, магазин, школу, фабрику або електростанцію!');
+   return;
+  }
+  const currentFloors=target.floors||1;
+  const floorCost=300+Math.floor((currentFloors-1)/3)*100;
+  const typeNames={house:'Хатинка',shop:'Магазин',school:'Школа',factory:'Фабрика',power:'Електростанція',hospital:'Лікарня',cafe:'Кафе',supermarket:'Супермаркет',office:'Офіс',cinema:'Кінотеатр',firestation:'Пожежна частина'};
+  const answer=confirm(typeNames[target.type]+' · поверхів: '+currentFloors+'\nНаступний поверх коштує ₡ '+floorCost+'.\n\nПобудувати поверх?');
+  if(!answer)return;
+  if(money<floorCost){
+   notify('Недостатньо грошей! Потрібно ₡ '+floorCost);
+   return;
+  }
+  money-=floorCost;
+  target.floors=currentFloors+1;
+  const baseHeights={house:4.5,shop:3.4,school:4.2,factory:4,power:3,hospital:5.2,cafe:3.5,supermarket:4,office:7,cinema:4.6,firestation:4};
+  const sizes={house:[3.7,3.7],shop:[3.7,3.7],school:[3.7,3.7],factory:[4.6,4.3],power:[3.7,3.7],hospital:[5.2,4.8],cafe:[4.2,3.8],supermarket:[5.2,4.8],office:[4.4,4.4],cinema:[5.4,4.8],firestation:[5,4.6]};
+  const [w,d]=sizes[target.type];
+  const y=baseHeights[target.type]+(currentFloors-1)*1.4;
+  const colors={house:0xe6d6b8,shop:0xe9a35e,school:0xd8e6ee,factory:0x8797a5,power:0xd9e2e8,hospital:0xf0f3f5,cafe:0xd99a69,supermarket:0xe9e2c9,office:0x9eb9c9,cinema:0x514a68,firestation:0xd85b4d};
+  addBox(target.group,w,1.4,d,colors[target.type],0,y+.7,0);
+  addBox(target.group,w+.15,.18,d+.15,0x52677c,0,y+1.5,0);
+  for(const side of [-1,1]){
+   addBox(target.group,.55,.55,.08,0x82d8e9,side*.9,y+.7,d/2+.05);
+  }
+  update();
+  saveGame();
+  notify('Поверх добудовано! Тепер поверхів: '+target.floors);
+  return;
+ }
+ // 🧹 ЗНЕСЕННЯ: вибір саме того об'єкта, на який натиснули.
+ if(demolish){
+  raycaster.setFromCamera(mouse,camera);
+  const hits=raycaster.intersectObjects(buildings.map(b=>b.group),true);
+  let found=-1;
+  if(hits.length){
+   let obj=hits[0].object;
+   while(obj && obj!==city && !buildings.some(b=>b.group===obj))obj=obj.parent;
+   found=buildings.findIndex(b=>b.group===obj);
+  }
+  // Запасний пошук, якщо користувач клацнув поряд із невисоким об'єктом.
+  if(found<0){
+   const nearby=buildings.map((b,i)=>({i,d:Math.hypot(b.x-x,b.z-z)}))
+    .filter(v=>v.d<3.4).sort((a,b)=>a.d-b.d)[0];
+   if(nearby)found=nearby.i;
+  }
+  if(found<0){notify('Клацни безпосередньо на будівлю, дорогу або світлофор!');return;}
+  const removed=buildings[found];
+  city.remove(removed.group);
+  for(let i=trafficLights.length-1;i>=0;i--){
+   if(trafficLights[i].group===removed.group)trafficLights.splice(i,1);
+  }
+  buildings.splice(found,1);
+  if(removed.type==='road'||removed.type==='roadrail'){updateRoadNetwork();updateRailNetwork();resetRoadTraffic();resetRoadCitizens();}
+  if(removed.type==='rail')updateRailNetwork();
+  const refund=removed.paidCost??(prices[removed.type]||0);
+  money+=refund;
+  playSound('demolish');
+  update();saveGame();
+  notify('Об’єкт знесено! Повернено ₡'+refund.toLocaleString('uk-UA')+'.');
+  return;
+ }
+
+ // ПЕРЕВІРКА ВІЛЬНОГО МІСЦЯ
+ if(buildings.some(b=>
+  Math.hypot(b.x-x,b.z-z)<4 &&
+  !(selected==='traffic' && (b.type==='road'||b.type==='roadrail'))
+ )){
+  notify('Це місце вже зайняте!');
+  return;
+ }
+
+ // ТРИ БЕЗКОШТОВНІ БУДИНКИ
+ const freeHouse=selected==='house' && freeHouses>0;
+ const cost=freeHouse?0:prices[selected];
+
+ if(money<cost){
+  notify('Недостатньо коштів!');
+  return;
+ }
+
+ money-=cost;
+
+if(freeHouse){
+  freeHouses--;
+  notify('Безкоштовний будинок! Залишилося: '+freeHouses);
+}else{
+  notify('Будівництво завершено!');
+}
+
+build(selected,x,z,rotation);
+buildings[buildings.length-1].paidCost=cost;
+if(selected==='road'||selected==='roadrail'){
+ updateRoadNetwork();updateRailNetwork();resetRoadTraffic();resetRoadCitizens();
+}
+playSound('build');
+update();
+});
+
+document.querySelectorAll('[data-type]').forEach(button=>{
+ button.onclick=()=>{
+  selected=button.dataset.type;
+  demolish=false;
+  if(selected==='rail')notify('Рейки: клацай плитки поруч одна з одною; R/кнопка повернути змінює напрямок');
+  if(selected==='roadrail')notify('Спільна дорога: автомобілі їдуть бічними смугами, потяг — рейками посередині!');
+  document.querySelectorAll('[data-type]').forEach(b=>b.classList.toggle('active',b===button));
+  document.getElementById('remove').classList.remove('active');
+  document.getElementById('rotate').classList.remove('active');
+ };
+});
+
+document.getElementById('rotate').onclick=()=>{
+ if(selected==='rail'){rotation+=Math.PI/2;notify('Напрямок рейок повернуто на 90°');return;}
+ selected='rotate';
+ demolish=false;
+
+ document.querySelectorAll('[data-type]').forEach(b=>{
+  b.classList.remove('active');
+ });
+
+ document.getElementById('rotate').classList.add('active');
+
+ notify('Клацни на будинок або дорогу, щоб повернути!');
+};
+
+document.getElementById('addFloor').onclick=()=>{
+ demolish=false;
+ selected='floor';
+ document.querySelectorAll('[data-type]').forEach(b=>b.classList.remove('active'));
+ document.getElementById('remove').classList.remove('active');
+ notify('Клацни на будівлю, щоб побачити ціну поверху');
+};
+
+// Кнопка знесення вмикає/вимикає режим видалення.
+document.getElementById('remove').onclick=()=>{
+ demolish=!demolish;
+ selected=demolish?'demolish':'house';
+ document.querySelectorAll('[data-type]').forEach(b=>b.classList.remove('active'));
+ document.getElementById('rotate').classList.remove('active');
+ document.getElementById('remove').classList.toggle('active',demolish);
+ notify(demolish?'Режим знесення: клацни на об’єкт, який хочеш прибрати.':'Режим знесення вимкнено.');
+};
+
+
+function getTerritoryRequirements(){
+ const multiplier=2**territoryLevel;
+ return Object.fromEntries(Object.entries(territoryBaseNeeds).map(([type,n])=>[type,n*multiplier]));
+}
+function refreshTerritoryPanel(){
+ const name=territoryStages[Math.min(territoryLevel,territoryStages.length-1)];
+ const nameEl=document.getElementById('territoryName');
+ const progressEl=document.getElementById('territoryProgress');
+ const button=document.getElementById('expandTerritory');
+ const details=document.getElementById('expandRequirements');
+ if(!nameEl||!button)return;
+ nameEl.textContent=name;
+ if(territoryLevel>=territoryStages.length-1){
+  button.disabled=true;
+  button.textContent='🌌 Максимальний рівень';
+  details.textContent='Ти досягнув Галактики!';
+  progressEl.textContent='Максимальне розширення';
+  return;
+ }
+ const req=getTerritoryRequirements();
+ const labels={house:'хатинок',shop:'магазинів',power:'електростанцій',parking:'парковок',school:'шкіл'};
+ const counts={};
+ Object.keys(req).forEach(type=>counts[type]=buildings.filter(b=>b.type===type).length);
+ const ready=Object.keys(req).every(type=>counts[type]>=req[type]);
+ details.textContent=Object.keys(req).map(type=>(counts[type]>=req[type]?'✅ ':'▫️ ')+labels[type]+': '+counts[type]+'/'+req[type]).join(' · ');
+ button.disabled=!ready;
+ button.style.opacity=ready?'1':'.55';
+ button.textContent=ready?'🗺️ Купити нову територію':'🔒 Розширити територію';
+ progressEl.textContent='Наступний етап: '+territoryStages[territoryLevel+1]+' · територія збільшиться в 3 рази';
+}
+document.getElementById('expandTerritory').addEventListener('click',()=>{
+ const req=getTerritoryRequirements();
+ const ready=Object.entries(req).every(([type,n])=>buildings.filter(b=>b.type===type).length>=n);
+ if(!ready){notify('Спочатку виконай усі умови!');refreshTerritoryPanel();return;}
+ territoryLevel++;
+ territoryRadius*=3;
+ rebuildTerritoryFence();
+ const scale=territoryRadius/29;
+ island.scale.set(scale,1,scale);
+ water.scale.set(scale*1.2,1,scale*1.2);
+ updateWorldVisibility();
+ // Не віддаляємо камеру після розширення: гравець залишається біля свого міста.
+ refreshTerritoryPanel();
+ update();
+ saveGame();
+ notify('Нова територія: '+territoryStages[territoryLevel]+'!');
+});
+
+function update(){
+ const count=t=>buildings.filter(b=>b.type===t).length;
+ const houses=count('house'),shops=count('shop'),schools=count('school'),parks=count('park'),factories=count('factory');
+ const power=count('power');
+ const roads=count('road'),parking=count('parking');
+ const income=houses*100+shops*150+schools*200+(power+factories)*500+
+  Math.floor(roads/10)*50+parks*50+parking*50+count('hospital')*250+count('cafe')*200+count('supermarket')*250+count('office')*350+count('cinema')*300+count('firestation')*200+
+  count('library')*180+count('university')*450+count('stadium')*400+count('hotel')*320+count('bank')*500+count('police')*220+count('museum')*230+count('station')*350+count('warehouse')*260+count('waterplant')*300;
+ const weatherPenalty=(weatherType==='storm'?12:weatherType==='rain'?5:weatherType==='snow'?3:0);
+ const happiness=Math.max(15,Math.min(100,70+parks*5+schools*2-weatherPenalty-Math.max(0,factories*3)));
+ const ecology=Math.max(10,Math.min(100,90-factories*10+parks*3-(weatherType==='storm'?3:0)));
+ const education=Math.min(100,15+schools*25);
+ const capacity=120+houses*32;
+ document.getElementById('money').textContent='₡ '+money.toLocaleString('uk-UA');
+ document.getElementById('population').textContent=population.toLocaleString('uk-UA');
+ document.getElementById('income').textContent='₡ '+income.toLocaleString('uk-UA');
+ document.getElementById('day').textContent=day;
+ document.getElementById('happy').textContent=happiness+'%';
+ document.getElementById('eco').textContent=ecology+'%';
+ document.getElementById('education').textContent=education+'%';
+ document.getElementById('happybar').style.width=happiness+'%';
+ document.getElementById('ecobar').style.width=ecology+'%';
+ document.getElementById('edubar').style.width=education+'%';
+ document.getElementById('residentLabel').textContent=population.toLocaleString('uk-UA');
+ document.getElementById('worldPanel').querySelector('h3').textContent='🌍 '+cityName+' · '+country;
+ document.getElementById('goal').textContent=houses<5?'Збудуй ще '+(5-houses)+' житлових будинків!':shops<2?'Побудуй ще один магазин!':schools<1?'Побудуй школу!':population<200?'Збільш населення до 200 жителів!':'Молодець! Місто розвивається!';
+ refreshWorldCities();
+ refreshTerritoryPanel();
+ return income;
+}
+
+// ⏱️ СИСТЕМА ІГРОВОГО ЧАСУ
+
+const nextButton=document.getElementById('next');
+
+let nextDayReadyAt=Number(
+ localStorage.getItem(DAY_KEY)
+)||0;
+
+function updateNextButton(){
+ const remaining=Math.ceil((nextDayReadyAt-Date.now())/1000);
+
+ if(remaining>0){
+  nextButton.disabled=true;
+  nextButton.textContent='⏳ Наступний день: '+remaining+' с';
+ }else{
+  nextButton.disabled=false;
+  nextButton.textContent='⏩ Наступний день';
+ }
+}
+
+nextButton.onclick=()=>{
+ if(Date.now()<nextDayReadyAt)return;
+
+ day++;
+ money+=update();
+playSound('money');
+
+ const homes=buildings.filter(b=>b.type==='house').length;
+ const capacity=120+homes*32;
+ if(population<capacity){
+  const happiness=70+buildings.filter(b=>b.type==='park').length*5+buildings.filter(b=>b.type==='school').length*2;
+  population=Math.min(capacity,population+(happiness>=80?8:4));
+ }
+ advanceWeather();
+ update();
+
+ nextDayReadyAt=Date.now()+45000;
+ localStorage.setItem(DAY_KEY,nextDayReadyAt);
+
+ updateNextButton();
+ playSound('day');
+notify('Настав день '+day+'!');
+};
+
+updateNextButton();
+setInterval(updateNextButton,250);
+
+document.getElementById('topview').onclick=()=>{
+ if(playerWalking){notify('Камера пішохода змінюється клавішею F5');return;}
+ height=.15;radius=55;
+ notify('Камера зверху');
+};
+document.getElementById('normalview').onclick=()=>{
+ if(playerWalking){notify('Камера пішохода змінюється клавішею F5');return;}
+ orbit360=false;document.getElementById('orbit360').textContent='🔄 Огляд 360°';
+ height=1;radius=48;notify('Звичайна камера');
+};
+let orbit360=false;
+document.getElementById('orbit360').onclick=()=>{
+ if(playerWalking){notify('У режимі пішохода камера слідує за персонажем');return;}
+ orbit360=!orbit360;
+ document.getElementById('orbit360').textContent=orbit360?'⏸ Зупинити огляд':'🔄 Огляд 360°';
+ notify(orbit360?'Камера робить повний оберт на 360°':'Огляд зупинено');
+};
+
+function saveGame(){
+ const data={
+  money,
+  freeHouses,
+  population,
+  day,
+  cityName,
+  country,
+  weather,
+  weatherType,
+  territoryLevel,
+  territoryRadius,
+  playerCarOwned,
+  playerVehicleType,
+  ownedVehicles,
+  playerCarPosition:playerCar?{x:playerCar.position.x,z:playerCar.position.z,yaw:playerCarYaw}:null,
+  homeBuildingPosition,productInventory,
+  buildings:buildings.map(b=>({
+   type:b.type,
+   x:b.x,
+   z:b.z,
+   rot:b.group.rotation.y,
+   floors:b.floors||1,
+   paidCost:b.paidCost??(prices[b.type]||0)
+  }))
+ };
+
+ localStorage.setItem(SAVE_KEY,JSON.stringify(data));
+}
+
+function loadGame(){
+ const raw=localStorage.getItem(SAVE_KEY);
+ if(!raw)return false;
+
+ try{
+  const data=JSON.parse(raw);
+
+  for(const b of buildings)city.remove(b.group);
+  buildings.length=0;
+  trafficLights.length=0;
+
+  money=data.money??0;
+  homeBuildingPosition=data.homeBuildingPosition||null;
+  Object.keys(productInventory).forEach(k=>delete productInventory[k]);Object.assign(productInventory,data.productInventory||{});refreshInventory();
+  freeHouses=data.freeHouses??3;
+  population=data.population??120;
+  day=data.day??1;
+  cityName=data.cityName??'місто';
+  country=data.country??'Україна';
+  weather=data.weather??'Сонячно';
+  weatherType=data.weatherType??'sun';
+  territoryLevel=Math.max(0,Math.min(territoryStages.length-1,data.territoryLevel??0));
+  territoryRadius=data.territoryRadius??(29*Math.pow(3,territoryLevel));
+  rebuildTerritoryFence();
+  playerCarOwned=!!data.playerCarOwned;
+  playerVehicleType=VEHICLES[data.playerVehicleType]?data.playerVehicleType:'car';
+  ownedVehicles=Array.isArray(data.ownedVehicles)?data.ownedVehicles.filter(v=>VEHICLES[v]):(data.playerCarOwned?['car']:[]);
+  if(playerCar){city.remove(playerCar);playerCar=null;}
+  if(playerCarOwned){const p=data.playerCarPosition||{x:0,z:10,yaw:0};playerCarYaw=p.yaw||0;playerCar=createPlayerCar(p.x??0,p.z??10,playerCarYaw,playerVehicleType);}
+  driveCarButton.disabled=!playerCarOwned;
+  relocateCarButton.disabled=!playerCarOwned;
+  garagePanel.querySelectorAll('[data-vehicle]').forEach(b=>{const v=VEHICLES[b.dataset.vehicle];b.textContent=ownedVehicles.includes(b.dataset.vehicle)?(playerVehicleType===b.dataset.vehicle?`✓ ${v.name} — обрано`:`↪ ${v.name} — вибрати`):`${v.name} · ₡ ${v.price.toLocaleString('uk-UA')}`;});
+  if(playerDriving)setDriving(false);
+  const territoryScale=territoryRadius/29;
+  island.scale.set(territoryScale,1,territoryScale);
+  water.scale.set(territoryScale*1.2,1,territoryScale*1.2);
+  updateWorldVisibility();
+  camera.updateProjectionMatrix();
+  document.getElementById('cityName').value=cityName;
+  document.getElementById('countrySelect').value=country;
+  season=seasonNames[Math.floor(((day-1)%16)/4)];
+  applyWeather();
+
+  for(const b of data.buildings||[]){
+   build(b.type,b.x,b.z,b.rot||0);
+
+   const house=buildings[buildings.length-1];
+   house.paidCost=b.paidCost??(prices[b.type]||0);
+
+   if(['house','shop','school','factory','power','hospital','cafe','supermarket','office','cinema','firestation'].includes(b.type) && b.floors>1){
+    const baseHeights={house:4.5,shop:3.4,school:4.2,factory:4,power:3,hospital:5.2,cafe:3.5,supermarket:4,office:7,cinema:4.6,firestation:4};
+    const sizes={house:[3.7,3.7],shop:[3.7,3.7],school:[3.7,3.7],factory:[4.6,4.3],power:[3.7,3.7],hospital:[5.2,4.8],cafe:[4.2,3.8],supermarket:[5.2,4.8],office:[4.4,4.4],cinema:[5.4,4.8],firestation:[5,4.6]};
+    const colors={house:0xe6d6b8,shop:0xe9a35e,school:0xd8e6ee,factory:0x8797a5,power:0xd9e2e8,hospital:0xf0f3f5,cafe:0xd99a69,supermarket:0xe9e2c9,office:0x9eb9c9,cinema:0x514a68,firestation:0xd85b4d};
+    const [w,d]=sizes[b.type];
+    for(let i=2;i<=b.floors;i++){
+     const y=baseHeights[b.type]+(i-2)*1.4;
+     house.floors=i;
+     addBox(house.group,w,1.4,d,colors[b.type],0,y+.7,0);
+     addBox(house.group,w+.15,.18,d+.15,0x52677c,0,y+1.5,0);
+     for(const side of [-1,1])addBox(house.group,.55,.55,.08,0x82d8e9,side*.9,y+.7,d/2+.05);
+    }
+   }
+  }
+
+  update();
+  refreshTerritoryPanel();
+  return true;
+ }catch(e){
+  console.error(e);
+  return false;
+ }
+}
+
+document.getElementById('save').onclick=()=>{
+ saveGame();
+ notify('Місто збережено!');
+};
+
+document.getElementById('load').onclick=()=>{
+ if(loadGame()){
+  notify('Місто завантажено!');
+ }else{
+  notify('Збереження не знайдено або пошкоджене');
+ }
+};
+
+const autoSaveTimer=setInterval(saveGame,5000);
+renderer.domElement.addEventListener('pointerdown',e=>{
+ if(manualRotate||playerDriving||playerWalking)return;
+ if(e.button===2){
+  dragging=true;lastX=e.clientX;lastY=e.clientY;
+ }
+});
+addEventListener('pointerup',()=>dragging=false);
+addEventListener('pointermove',e=>{
+ if(!dragging)return;
+ angle-=(e.clientX-lastX)*.006;
+ height=Math.max(.2,Math.min(1.5,height+(e.clientY-lastY)*.005));
+ lastX=e.clientX;lastY=e.clientY;
+});
+renderer.domElement.addEventListener('wheel',e=>{
+ // Експоненційний зум: швидко долаємо великі відстані на рівні «Світ».
+ radius=Math.max(13,Math.min(Math.max(120,territoryRadius*3.2),radius*Math.exp(e.deltaY*.002)));
+},{passive:true});
+
+let lastFrame=performance.now();
+let lastRender=0;
+function animate(now=performance.now()){
+ requestAnimationFrame(animate);
+ // Обмеження частоти кадрів прибирає зайве навантаження, не змінюючи швидкість симуляції.
+ if(now-lastRender<18)return;
+ const dt=Math.min((now-lastFrame)/1000,.035);
+ lastFrame=now;lastRender=now;
+ // Автомобілі їдуть по головній дорозі та зупиняються на червоний/жовтий сигнал
+ // Автомобілі дотримуються дистанції та рухаються мережею доріг.
+ updateRoadTraffic(dt);
+ // Пішоходи йдуть тротуарами вздовж доріг.
+ updateRoadCitizens(dt);
+ updatePlayerCar(dt);
+ updateTrain(dt);
+ updatePedestrian(dt);
+ // Рух крапель дощу або сніжинок
+ if(weatherParticles){
+  const pos=weatherParticles.geometry.attributes.position;
+  for(let i=0;i<pos.count;i++){
+   pos.array[i*3+1]+=weatherParticleVelocities[i]*(weatherType==='rain'?55:12)*dt;
+   if(pos.array[i*3+1]<0){pos.array[i*3+1]=25+Math.random()*8;pos.array[i*3]= (Math.random()-.5)*75;pos.array[i*3+2]=(Math.random()-.5)*75;}
+  }
+  pos.needsUpdate=true;
+ }
+ if(orbit360&&!playerDriving)angle+=dt*(Math.PI*2/14);
+ if(playerWalking){
+  const px=pedestrian.position.x,pz=pedestrian.position.z;
+  if(playerFirstPerson){
+   camera.position.set(px,2.35+pedestrianJump,pz);
+   camera.lookAt(px-Math.sin(playerYaw)*12,2.15+pedestrianJump-Math.sin(pointerLookPitch)*5,pz-Math.cos(playerYaw)*12);
+  }else{
+   const backX=Math.sin(playerYaw)*8,backZ=Math.cos(playerYaw)*8;
+   camera.position.set(px+backX,6.2,pz+backZ);
+   camera.lookAt(px,1.0,pz);
+  }
+ }else if(trainDriving && trainGroup){
+  const fx=-Math.sin(trainYaw),fz=-Math.cos(trainYaw);
+  camera.position.set(trainGroup.position.x+fx*.2,trainGroup.position.y+2.9,trainGroup.position.z+fz*.2);
+  camera.lookAt(trainGroup.position.x+fx*14,trainGroup.position.y+2.1,trainGroup.position.z+fz*14);
+ }else if(playerDriving && playerCar){
+  const fx=-Math.sin(playerCarYaw),fz=-Math.cos(playerCarYaw);
+  camera.position.set(playerCar.position.x+fx*.25,playerCar.position.y+1.75,playerCar.position.z+fz*.25);
+  camera.lookAt(playerCar.position.x+fx*12,playerCar.position.y+1.55,playerCar.position.z+fz*12);
+ }else{
+  camera.position.set(radius*Math.sin(angle),radius*height,radius*Math.cos(angle));
+  camera.lookAt(0,0,0);
+ }
+ renderer.render(scene,camera);
+}
+
+if(!loadGame()){
+ update();
+}
+updateWorldVisibility();
+resetRoadTraffic();
+resetRoadCitizens();
+resetCityRobots();
+driveCarButton.disabled=!playerCarOwned;
+relocateCarButton.disabled=!playerCarOwned;
+
+animate();
+
+addEventListener('resize',()=>{
+ camera.aspect=innerWidth/innerHeight;
+ camera.updateProjectionMatrix();
+ renderer.setSize(innerWidth,innerHeight);
+});
+</script>
+</body>
+</html>
