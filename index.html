@@ -1,3 +1,4 @@
+```
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -175,6 +176,8 @@ button:hover{background:#326080}
   <button id="manualRotate">🖱️ Ручне обертання</button>
  <button id="save">💾 Зберегти</button>
  <button id="load">📂 Завантажити</button>
+ <button id="importSave">📥 Імпортувати місто</button>
+ <input id="importSaveFile" type="file" accept=".json,application/json" style="display:none">
 </div>
 <div id="settingsPanel" class="panel" style="
  display:none;
@@ -2295,6 +2298,63 @@ document.getElementById('load').onclick=()=>{
  }
 };
 
+// Імпорт резервної копії міста безпосередньо в активний профіль браузера.
+const importSaveButton=document.getElementById('importSave');
+const importSaveFile=document.getElementById('importSaveFile');
+
+importSaveButton.onclick=()=>importSaveFile.click();
+
+importSaveFile.onchange=async()=>{
+ const file=importSaveFile.files&&importSaveFile.files[0];
+ if(!file)return;
+
+ try{
+  const imported=JSON.parse(await file.text());
+  const data=imported&&typeof imported==='object'&&!Array.isArray(imported)
+   ?(imported.save&&typeof imported.save==='object'?imported.save:imported)
+   :null;
+
+  if(!data||!Array.isArray(data.buildings)){
+   throw new Error('У файлі немає масиву buildings');
+  }
+
+  const validBuildings=data.buildings.every(b=>
+   b&&typeof b.type==='string'&&Object.prototype.hasOwnProperty.call(prices,b.type)&&
+   Number.isFinite(Number(b.x))&&Number.isFinite(Number(b.z))
+  );
+  if(!validBuildings)throw new Error('Список будівель пошкоджений або містить невідомі типи');
+
+  const numericFields=['money','population','day','territoryLevel','territoryRadius'];
+  for(const key of numericFields){
+   if(data[key]!==undefined&&!Number.isFinite(Number(data[key]))){
+    throw new Error('Некоректне значення поля '+key);
+   }
+  }
+
+  // Зберігаємо попередній стан, щоб його можна було повернути при помилці.
+  const previousSave=localStorage.getItem(SAVE_KEY);
+  const previousDay=localStorage.getItem(DAY_KEY);
+
+  localStorage.setItem(SAVE_KEY,JSON.stringify(data));
+  if(loadGame()){
+   saveGame();
+   notify('Місто успішно імпортовано! Будівель: '+data.buildings.length);
+  }else{
+   if(previousSave===null)localStorage.removeItem(SAVE_KEY);
+   else localStorage.setItem(SAVE_KEY,previousSave);
+   if(previousDay===null)localStorage.removeItem(DAY_KEY);
+   else localStorage.setItem(DAY_KEY,previousDay);
+   throw new Error('Гра не змогла завантажити це збереження');
+  }
+ }catch(error){
+  console.error('Помилка імпорту MEGA KOSMOS:',error);
+  notify('Не вдалося імпортувати: '+(error.message||'невідомий формат'));
+  alert('Не вдалося імпортувати збереження.\n'+(error.message||'Перевір JSON-файл.'));
+ }finally{
+  importSaveFile.value='';
+ }
+};
+
 const autoSaveTimer=setInterval(saveGame,5000);
 renderer.domElement.addEventListener('pointerdown',e=>{
  if(manualRotate||playerDriving||playerWalking)return;
@@ -2385,3 +2445,4 @@ addEventListener('resize',()=>{
 </script>
 </body>
 </html>
+```
